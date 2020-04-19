@@ -6,6 +6,7 @@ import Transition.MTMTransition;
 import java.awt.*;
 import java.awt.event.*;
 import java.util.ArrayList;
+import java.util.Random;
 import javax.swing.*;
 
 public class Board extends JPanel implements ActionListener, MouseListener {
@@ -17,10 +18,12 @@ public class Board extends JPanel implements ActionListener, MouseListener {
     private final int DELAY1 = 2;
     private final int DELAY2 = 20;
     private final double CellToWallRatio = 0.9;
-    private final int CELLSIZE = 60;
+    private final int CELLSIZE = 110;
     private final int MOVINGRATE = 15;
     private final int GOALSIZE = 10;
     private final double WALLRATE = 0.05;
+
+    private int creationFlag = 2;
 
     private int step = 0;
 
@@ -46,16 +49,20 @@ public class Board extends JPanel implements ActionListener, MouseListener {
 
     private MazeCell[][] cells = new MazeCell[B_WIDTH / CELLSIZE][B_HEIGHT / CELLSIZE];
 
+    private int[][] prevCell = new int[cells.length][cells[0].length]; // for dfs
+
     private ArrayList<Integer> treeSize = new ArrayList<>();
 
-    private ArrayList<MTMTransition> paths = new ArrayList<>();
+    private ArrayList<MTMTransition> paths = new ArrayList<>(); // for kruskal
 
-    private ArrayList<Double> quickHelp = new ArrayList<>();
-    private ArrayList<Double> quickHelp1 = new ArrayList<>();
+    private ArrayList<Double> binHelp = new ArrayList<>(); // for anything related to binary searching
+    private ArrayList<Double> binHelp1 = new ArrayList<>(); // for anything related to binary searching
 
 
     private ArrayList<TreeCell> searchCells = new ArrayList<>();
     private ArrayList<TreeCell> searchedCells = new ArrayList<>();
+
+    Random rnd = new Random();
 
     public Board() {
         setPreferredSize(new Dimension(B_WIDTH, B_HEIGHT)); // sets screen size
@@ -70,11 +77,23 @@ public class Board extends JPanel implements ActionListener, MouseListener {
     public void actionPerformed(ActionEvent e) {
         if (step == 0){
             resetCells();
-            resetPaths();
+            if (creationFlag == 1)
+                resetPaths();
+            if (creationFlag == 2){
+                startX = rnd.nextInt(cells.length);
+                startY = rnd.nextInt(cells[startX].length);
+                prevCell[startX][startY] = -1;
+                trees.add(cells[startX][startY]);
+            }
             step = 1;
         }
-        if (step == 1)
-            kruskalStep();
+        if (step == 1){
+            if (creationFlag == 1)
+                kruskalStep();
+            if (creationFlag == 2)
+                dfsStep();
+        }
+
         if (step == 2){
             while (trees.size() > 1)
                 trees.remove(0);
@@ -142,11 +161,11 @@ public class Board extends JPanel implements ActionListener, MouseListener {
             ((TreeCell)trees.get(0)).move();
     }
 
-    private int quickSearchH(Double in, ArrayList<Double> arr){
-        return quickSearch(arr, in,0, quickHelp.size() - 1);
+    private int binSearchH(Double in, ArrayList<Double> arr){
+        return binSearch(arr, in,0, binHelp.size() - 1);
     }
 
-    private int quickSearch(ArrayList<Double> arr, Double in, int start, int finish){
+    private int binSearch(ArrayList<Double> arr, Double in, int start, int finish){
         if (start > finish)
             return start;
         if (start == finish){
@@ -163,9 +182,9 @@ public class Board extends JPanel implements ActionListener, MouseListener {
         }
         int i = (start + finish) / 2;
         if (in > arr.get(i))
-            return quickSearch(arr, in, i, finish);
+            return binSearch(arr, in, i, finish);
         if (in < arr.get(i))
-            return quickSearch(arr, in, start, i);
+            return binSearch(arr, in, start, i);
         return i;
     }
 
@@ -176,16 +195,16 @@ public class Board extends JPanel implements ActionListener, MouseListener {
             return;
         }
         searching.colorBackwards(SearchedColor, SearchColor);
-        double value = quickHelp.remove(0);
-        int index = quickSearchH(value, quickHelp1);
-        quickHelp1.add(index, value);
+        double value = binHelp.remove(0);
+        int index = binSearchH(value, binHelp1);
+        binHelp1.add(index, value);
         searchedCells.add(index, searching);
         for (Transition transition : searching.getTransitions())
             if (transition != null)
                 if (!treeCellExistsIn((TreeCell)transition.getCells()[1], searchedCells)){
                     value = value1((TreeCell)transition.getCells()[1]);
-                    index = quickSearchH(value, quickHelp);
-                    quickHelp.add(index, value);
+                    index = binSearchH(value, binHelp);
+                    binHelp.add(index, value);
                     searchCells.add(index, (TreeCell)transition.getCells()[1]);
                 }
         searchCells.get(0).colorBackwards(SearchColor, WallColor);
@@ -216,9 +235,9 @@ public class Board extends JPanel implements ActionListener, MouseListener {
                 for (int k = 0; k <= 1; k++)
                     if (i + k < cells.length && j + (1 - k) < cells[i].length){
                         trn = new MTMTransition(cells[i][j], cells[i + k][j + (1 - k)], CellColor,  CELLSIZE, CellToWallRatio);
-                        ind = quickSearchH(trn.getWeight(), quickHelp);
+                        ind = binSearchH(trn.getWeight(), binHelp);
                         paths.add(ind, trn);
-                        quickHelp.add(ind, trn.getWeight());
+                        binHelp.add(ind, trn.getWeight());
                     }
     }
 
@@ -277,14 +296,14 @@ public class Board extends JPanel implements ActionListener, MouseListener {
                         }
             if (flag){
                 step = 8;
-                quickHelp.clear();
-                quickHelp.add(value1((TreeCell) trees.get(0)));
+                binHelp.clear();
+                binHelp.add(value1((TreeCell) trees.get(0)));
                 searchCells.add((TreeCell) trees.get(0));
             }
         }
         if (step == 9){
-            quickHelp.clear();
-            quickHelp1.clear();
+            binHelp.clear();
+            binHelp1.clear();
             paths.clear();
             searchCells.clear();
             searchedCells.clear();
@@ -344,7 +363,38 @@ public class Board extends JPanel implements ActionListener, MouseListener {
     }
 
     private void dfsStep(){
-        //coming soon
+        int temp = prevCell[startX][startY];
+        MazeCell cell = cells[startX][startY];
+        cell.setSearched(true);
+        ArrayList<Integer> arr = new ArrayList<>();
+        if (startX > 0)
+            if (!cells[startX - 1][startY].isSearched())
+                arr.add(startX - 1 + startY * cells.length);
+        if (startY > 0)
+            if (!cells[startX][startY - 1].isSearched())
+                arr.add(startX + (startY - 1) * cells.length);
+        if (startX + 1 < cells.length)
+            if (!cells[startX + 1][startY].isSearched())
+                arr.add(startX + 1 + startY * cells.length);
+        if (startY + 1 < cells[startX].length)
+            if (!cells[startX][startY + 1].isSearched())
+                arr.add(startX + (startY + 1) * cells.length);
+        if (arr.size() == 0){
+            if (temp == -1)
+                step = 2;
+            else{
+                startX = temp%cells.length;
+                startY = temp/cells.length;
+            }
+            return;
+        }
+        temp = arr.get(rnd.nextInt(arr.size()));
+        startX = temp%cells.length;
+        startY = temp/cells.length;
+        prevCell[startX][startY] = cell.getArrX() + cell.getArrY() * cells.length;
+        Transition transition = new MTMTransition(cell, cells[startX][startY], CellColor,  CELLSIZE, CellToWallRatio);
+        cell.setTrans(transition);
+        cells[startX][startY].setTrans(transition);
     }
 
     public void recursiveDivisionStep(){

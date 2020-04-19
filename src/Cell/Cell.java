@@ -13,7 +13,7 @@ public abstract class Cell {
     protected Transition[] transitions = {null, null, null, null};
     protected Color WallColor;
     protected Color CellColor;
-    protected boolean searched;
+    protected boolean searched = false;
 
     public Cell(int xs, int ys, int arrXs, int arrYs, Color wallC, Color cellC) {
         x = xs;
@@ -63,6 +63,10 @@ public abstract class Cell {
         while (transitions[i] != null)
             i++;
         transitions[i] = transition;
+    }
+
+    public void setSearched(boolean searched) {
+        this.searched = searched;
     }
 
     public boolean isSearched() {
