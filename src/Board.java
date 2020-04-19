@@ -88,8 +88,12 @@ public class Board extends JPanel implements ActionListener, MouseListener {
                 intCells[startX][startY] = -1;
                 trees.add(cells[startX][startY]);
             }
-            if (creationFlag == 3)
+            if (creationFlag == 3){
+                for (int i = 0; i < cells.length; i++)
+                    for (int j = 0; j < cells[i].length; j++)
+                        intCells[i][j] = 0;
                 startY = 0;
+            }
             step = 1;
         }
         if (step == 1){
