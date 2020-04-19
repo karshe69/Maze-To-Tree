@@ -169,32 +169,6 @@ public class Board extends JPanel implements ActionListener, MouseListener {
         return i;
     }
 
-    private void kruskalStep(){
-        if (paths.isEmpty()){
-            step = 2;
-            return;
-        }
-        int i = 0;
-        paths.get(i).getCells()[1].resetSearched();
-        boolean flag = paths.get(i).getCells()[0].dfsShell(paths.get(i).getCells()[1]);
-        while (flag){
-            paths.remove(i);
-            if (paths.isEmpty()){
-                step = 2;
-                return;
-            }
-            i = 0;
-            paths.get(i).getCells()[1].resetSearched();
-            flag = paths.get(i).getCells()[0].dfsShell(paths.get(i).getCells()[1]);
-        }
-
-        paths.get(i).getCells()[0].setTrans(paths.get(i));
-        paths.get(i).getCells()[1].setTrans(paths.get(i));
-        trees.add(paths.get(i).getCells()[0]);
-
-        paths.remove(i);
-    }
-
     public void best_first_search() {
         TreeCell searching = searchCells.remove(0);
         if (searching.getArrX() == finishX && searching.getArrY() == finishY) {
@@ -339,5 +313,53 @@ public class Board extends JPanel implements ActionListener, MouseListener {
     @Override
     public void mouseExited(MouseEvent e) {
 
+    }
+
+    // maze creating algorithms:
+
+    private void kruskalStep(){
+        if (paths.isEmpty()){
+            step = 2;
+            return;
+        }
+        int i = 0;
+        paths.get(i).getCells()[1].resetSearched();
+        boolean flag = paths.get(i).getCells()[0].dfsShell(paths.get(i).getCells()[1]);
+        while (flag){
+            paths.remove(i);
+            if (paths.isEmpty()){
+                step = 2;
+                return;
+            }
+            i = 0;
+            paths.get(i).getCells()[1].resetSearched();
+            flag = paths.get(i).getCells()[0].dfsShell(paths.get(i).getCells()[1]);
+        }
+
+        paths.get(i).getCells()[0].setTrans(paths.get(i));
+        paths.get(i).getCells()[1].setTrans(paths.get(i));
+        trees.add(paths.get(i).getCells()[0]);
+
+        paths.remove(i);
+    }
+
+    private void dfsStep(){
+        //coming soon
+    }
+
+    public void recursiveDivisionStep(){
+        //coming soon
+    }
+
+    public void primStep(){
+        //coming soon
+    }
+
+    public void wilsonStep(){
+        //coming soon
+    }
+
+    public void ellerStep(){
+        //coming soon
     }
 }
