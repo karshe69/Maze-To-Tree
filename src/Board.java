@@ -6,6 +6,7 @@ import Transition.MTMTransition;
 import java.awt.*;
 import java.awt.event.*;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Random;
 import javax.swing.*;
 
@@ -18,14 +19,16 @@ public class Board extends JPanel implements ActionListener, MouseListener {
     private final int DELAY1 = 2;
     private final int DELAY2 = 20;
     private final double CellToWallRatio = 0.9;
-    private final int CELLSIZE = 110;
+    private final int CELLSIZE = 50;
     private final int MOVINGRATE = 15;
     private final int GOALSIZE = 10;
     private final double WALLRATE = 0.05;
 
-    private int creationFlag = 2;
+    private int creationFlag = 3;
 
     private int step = 0;
+
+    private final double EllersChance = 0.5;
 
     private final Color CellColor = new Color(34, 53, 64);
     private final Color WallColor = new Color(169, 184, 201);
@@ -38,8 +41,8 @@ public class Board extends JPanel implements ActionListener, MouseListener {
     private double mouseX = 0;
     private double mouseY = 0;
 
-    private int startX = 0;
-    private int startY = 0;
+    private int startX = 0; // also used in dfs for remembering which cell im currently on.
+    private int startY = 0; // also used in dfs for remembering which cell im currently on and for eller's to remember which row im currently on.
     private int finishX = 0;
     private int finishY = 0;
 
@@ -49,7 +52,7 @@ public class Board extends JPanel implements ActionListener, MouseListener {
 
     private MazeCell[][] cells = new MazeCell[B_WIDTH / CELLSIZE][B_HEIGHT / CELLSIZE];
 
-    private int[][] prevCell = new int[cells.length][cells[0].length]; // for dfs
+    private int[][] intCells = new int[cells.length][cells[0].length]; // for dfs
 
     private ArrayList<Integer> treeSize = new ArrayList<>();
 
@@ -82,9 +85,11 @@ public class Board extends JPanel implements ActionListener, MouseListener {
             if (creationFlag == 2){
                 startX = rnd.nextInt(cells.length);
                 startY = rnd.nextInt(cells[startX].length);
-                prevCell[startX][startY] = -1;
+                intCells[startX][startY] = -1;
                 trees.add(cells[startX][startY]);
             }
+            if (creationFlag == 3)
+                startY = 0;
             step = 1;
         }
         if (step == 1){
@@ -92,6 +97,8 @@ public class Board extends JPanel implements ActionListener, MouseListener {
                 kruskalStep();
             if (creationFlag == 2)
                 dfsStep();
+            if (creationFlag == 3)
+                ellerStep();
         }
 
         if (step == 2){
@@ -241,6 +248,13 @@ public class Board extends JPanel implements ActionListener, MouseListener {
                     }
     }
 
+    public void ellersHelper(int a, int b){
+        for (int i = 0; i < cells.length; i++)
+            for (int j = 0; j <= startY; j++)
+                if (intCells[i][j] == a)
+                    intCells[i][j] = b;
+    }
+
     @Override
     public void mouseClicked(MouseEvent e) {
         if (step == 3){
@@ -363,7 +377,7 @@ public class Board extends JPanel implements ActionListener, MouseListener {
     }
 
     private void dfsStep(){
-        int temp = prevCell[startX][startY];
+        int temp = intCells[startX][startY];
         MazeCell cell = cells[startX][startY];
         cell.setSearched(true);
         ArrayList<Integer> arr = new ArrayList<>();
@@ -391,10 +405,65 @@ public class Board extends JPanel implements ActionListener, MouseListener {
         temp = arr.get(rnd.nextInt(arr.size()));
         startX = temp%cells.length;
         startY = temp/cells.length;
-        prevCell[startX][startY] = cell.getArrX() + cell.getArrY() * cells.length;
+        intCells[startX][startY] = cell.getArrX() + cell.getArrY() * cells.length;
         Transition transition = new MTMTransition(cell, cells[startX][startY], CellColor,  CELLSIZE, CellToWallRatio);
         cell.setTrans(transition);
         cells[startX][startY].setTrans(transition);
+    }
+
+    public void ellerStep(){
+        double chance = EllersChance;
+        if (startY == cells[0].length - 1){
+            chance = 1;
+            step = 2;
+        }
+
+        if (!(startY == 0)){
+            int[] arr = new int[cells.length * startY];
+            for (int i = 0; i < cells.length; i++)
+                arr[i] = 0;
+            for (int i = 0; i < cells.length; i++){
+                arr[intCells[i][startY - 1] - 1] ++;
+            }
+
+            ArrayList<Boolean> arr1 = new ArrayList<>();
+            for (int i = 0; i < arr.length; i++){
+                if (arr[i] != 0){
+                    arr1.add(true);
+                    for (int j = 0; j < arr[i] - 1; j++)
+                        if (rnd.nextDouble() <= chance)
+                            arr1.add(true);
+                        else
+                            arr1.add(false);
+                }
+
+                for (int j = 0; j < cells.length; j++)
+                    if (i + 1 == intCells[j][startY - 1])
+                        if (arr1.remove(rnd.nextInt(arr1.size())) && intCells[j][startY - 1] != intCells[j][startY]){
+                            Transition transition = new MTMTransition(cells[j][startY], cells[j][startY - 1], CellColor,  CELLSIZE, CellToWallRatio);
+                            cells[j][startY - 1].setTrans(transition);
+                            cells[j][startY].setTrans(transition);
+                            intCells[j][startY] = intCells[j][startY - 1];
+                        }
+            }
+        }
+
+        for (int i = 0; i < cells.length; i++)
+            if (intCells[i][startY] == 0)
+                intCells[i][startY] = i + startY * cells.length + 1;
+
+        for (int i = 0; i < cells.length - 1; i++)
+            if (rnd.nextDouble() <= chance && intCells[i][startY] != intCells[i + 1][startY]){
+                Transition transition = new MTMTransition(cells[i][startY], cells[i + 1][startY], CellColor,  CELLSIZE, CellToWallRatio);
+                cells[i][startY].setTrans(transition);
+                cells[i + 1][startY].setTrans(transition);
+                ellersHelper(intCells[i + 1][startY], intCells[i][startY]);
+            }
+
+        for (int i = 0; i < cells.length; i++)
+            if (intCells[i][startY] > startY * cells.length)
+                trees.add(cells[i][startY]);
+        startY += 1;
     }
 
     public void recursiveDivisionStep(){
@@ -406,10 +475,6 @@ public class Board extends JPanel implements ActionListener, MouseListener {
     }
 
     public void wilsonStep(){
-        //coming soon
-    }
-
-    public void ellerStep(){
         //coming soon
     }
 }
