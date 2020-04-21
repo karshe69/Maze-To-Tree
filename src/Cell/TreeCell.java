@@ -90,6 +90,17 @@ public class TreeCell extends Cell {
         ((TreeCell)prev.getCells()[0]).colorBackwards(c1, c2);
     }
 
+    public void resetColor(Color c){
+        if (WallColor == c)
+            return;
+        WallColor = c;
+        for (Transition transition : transitions)
+            if (transition != null){
+                transition.setCellColor(c);
+                ((TreeCell)transition.getCells()[1]).resetColor(c);
+            }
+    }
+
     @Override
     public double getCellToWallRatio() {
         return 1;

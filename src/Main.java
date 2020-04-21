@@ -1,4 +1,4 @@
-import java.awt.EventQueue;
+import java.awt.*;
 import javax.swing.JFrame;
 
 
@@ -13,7 +13,6 @@ public class Main extends JFrame {
     private void initUI() {
         board = new Board();
         add(board);
-
         setResizable(false);
         pack();
 
