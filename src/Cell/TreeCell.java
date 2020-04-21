@@ -6,6 +6,7 @@ import Transition.TreeTTreeTransition;
 
 import java.awt.*;
 import java.util.ArrayList;
+import java.util.Objects;
 
 public class TreeCell extends Cell {
     private int movingRate;
@@ -96,5 +97,25 @@ public class TreeCell extends Cell {
 
     public void setPrev(TreeTTreeTransition prev) {
         this.prev = prev;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        TreeCell treeCell = (TreeCell) o;
+        return movingRate == treeCell.movingRate &&
+                index == treeCell.index &&
+                row == treeCell.row &&
+                b_height == treeCell.b_height &&
+                b_width == treeCell.b_width &&
+                CellSize == treeCell.CellSize &&
+                Objects.equals(prev, treeCell.prev) &&
+                Objects.equals(treeSize, treeCell.treeSize);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(movingRate, index, row, b_height, b_width, CellSize, prev, treeSize);
     }
 }

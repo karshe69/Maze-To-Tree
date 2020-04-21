@@ -6,7 +6,6 @@ import Transition.MTMTransition;
 import java.awt.*;
 import java.awt.event.*;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Random;
 import javax.swing.*;
 
@@ -14,10 +13,15 @@ public class Board extends JPanel implements ActionListener, MouseListener {
     Toolkit tk = Toolkit.getDefaultToolkit();
 
     private final int B_WIDTH = (int) tk.getScreenSize().getWidth(); // width of the screen
-    private final int B_HEIGHT = (int) tk.getScreenSize().getHeight() - 50; // height of the screen
+    private final int B_HEIGHT = (int) tk.getScreenSize().getHeight(); // height of the screen
+
+    private final int M_WIDTH = B_WIDTH - 300;
+    private final int M_HEIGHT = B_HEIGHT - 50;
 
     private final int DELAY1 = 2;
     private final int DELAY2 = 20;
+    private final int DELAYE = 300;
+
     private final double CellToWallRatio = 0.9;
     private final int CELLSIZE = 50;
     private final int MOVINGRATE = 15;
@@ -50,7 +54,7 @@ public class Board extends JPanel implements ActionListener, MouseListener {
 
     private Timer timer;
 
-    private MazeCell[][] cells = new MazeCell[B_WIDTH / CELLSIZE][B_HEIGHT / CELLSIZE];
+    private MazeCell[][] cells = new MazeCell[M_WIDTH / CELLSIZE][M_HEIGHT / CELLSIZE];
 
     private int[][] intCells = new int[cells.length][cells[0].length]; // for dfs
 
@@ -159,13 +163,19 @@ public class Board extends JPanel implements ActionListener, MouseListener {
 
     private void drawStuff(Graphics g) {
         Graphics2D g2 = (Graphics2D) g;
-        for (MazeCell[] cll:cells)
-            for (MazeCell cell:cll)
-                cell.draw(g2);
+        if (step == 6 || step == 7)
+            for (MazeCell[] cll:cells)
+                for (MazeCell cell:cll)
+                    cell.draw(g2);
+        if (step == -1){
+
+        }
+        else{
         for (Cell cell:trees)
             cell.draw(g2);
         for (Cell cell:trees)
             cell.resetDrawn();
+        }
         if (step == 6)
             ((TransformingCell)trees.get(0)).move();
         if (step == 7)
@@ -173,7 +183,7 @@ public class Board extends JPanel implements ActionListener, MouseListener {
     }
 
     private int binSearchH(Double in, ArrayList<Double> arr){
-        return binSearch(arr, in,0, binHelp.size() - 1);
+        return binSearch(arr, in,0, arr.size() - 1);
     }
 
     private int binSearch(ArrayList<Double> arr, Double in, int start, int finish){
@@ -212,8 +222,8 @@ public class Board extends JPanel implements ActionListener, MouseListener {
         searchedCells.add(index, searching);
         for (Transition transition : searching.getTransitions())
             if (transition != null)
-                if (!treeCellExistsIn((TreeCell)transition.getCells()[1], searchedCells)){
-                    value = value1((TreeCell)transition.getCells()[1]);
+                if (!treeCellExistsIn((TreeCell)transition.getCells()[1], searchedCells, binHelp1)){
+                    value = evaluate((TreeCell)transition.getCells()[1]);
                     index = binSearchH(value, binHelp);
                     binHelp.add(index, value);
                     searchCells.add(index, (TreeCell)transition.getCells()[1]);
@@ -222,11 +232,19 @@ public class Board extends JPanel implements ActionListener, MouseListener {
         searchCells.get(0).colorBackwards(SearchColor, SearchedColor);
     }
 
-    public boolean treeCellExistsIn(TreeCell query, ArrayList<TreeCell> list){
+    public boolean treeCellExistsIn(TreeCell query, ArrayList<TreeCell> list, ArrayList<Double> arrL){
+        double value = evaluate(query);
+        int index = binSearchH(value, arrL);
+        if (index >= arrL.size())
+            return false;
+        for (;index > 0 && arrL.get(index - 1) == value; index--);
+        for (;arrL.get(index) == value; index++)
+            if (list.get(index).equals(query))
+                return true;
         return false;
     }
 
-    public double value1(TreeCell query){
+    public double evaluate(TreeCell query){
         int x = query.getArrX() - finishX;
         int y = query.getArrY() - finishY;
         return x*x + y*y;
@@ -234,8 +252,10 @@ public class Board extends JPanel implements ActionListener, MouseListener {
 
     public void resetCells(){
         for (int i = 0; i < cells.length; i++)
-            for (int j = 0; j < cells[i].length; j++)
+            for (int j = 0; j < cells[i].length; j++){
                 cells[i][j] = new MazeCell(i, j, CELLSIZE, CellToWallRatio, WallColor, CellColor);
+                cells[i][j].setDrawn(true);
+            }
     }
 
     public void resetPaths(){
@@ -297,7 +317,7 @@ public class Board extends JPanel implements ActionListener, MouseListener {
         }
         if (step == 5){
             trees.remove(0);
-            trees.add(new TransformingCell(cells[startX][startY], MOVINGRATE, WALLRATE, 0, 0, GOALSIZE, B_HEIGHT, B_WIDTH, treeSize));
+            trees.add(new TransformingCell(cells[startX][startY], MOVINGRATE, WALLRATE, 0, 0, GOALSIZE, M_HEIGHT, M_WIDTH, treeSize));
             treeSize.add(0, 1);
             for (int i = 0; i < 15; i++)
                 treeSize.add(treeSize.size(), 0);
@@ -315,7 +335,7 @@ public class Board extends JPanel implements ActionListener, MouseListener {
             if (flag){
                 step = 8;
                 binHelp.clear();
-                binHelp.add(value1((TreeCell) trees.get(0)));
+                binHelp.add(evaluate((TreeCell) trees.get(0)));
                 searchCells.add((TreeCell) trees.get(0));
             }
         }
@@ -327,9 +347,13 @@ public class Board extends JPanel implements ActionListener, MouseListener {
             searchedCells.clear();
             treeSize.clear();
             trees.clear();
-            timer.setDelay(DELAY1);
+            if (creationFlag == 3)
+                timer.setDelay(DELAYE);
+            else
+                timer.setDelay(DELAY1);
             step = 0;
         }
+
     }
 
     @Override

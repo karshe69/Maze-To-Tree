@@ -95,6 +95,10 @@ public abstract class Cell {
         WallColor = wallColor;
     }
 
+    public void setDrawn(boolean drawn) {
+        this.drawn = drawn;
+    }
+
     public Color getCellColor() {
         return CellColor;
     }
