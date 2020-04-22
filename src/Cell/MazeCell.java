@@ -36,6 +36,8 @@ public class MazeCell extends Cell{
     }
 
     public boolean dfsShell(MazeCell cell){
+        System.out.println(cell.getArrX() + " " + cell.getArrY());
+        System.out.println(arrX + " " + arrY);
         resetSearched();
         return dfs(cell);
     }
