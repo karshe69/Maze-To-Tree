@@ -22,6 +22,9 @@ public class Board extends JPanel implements ActionListener, MouseListener {
     private final int BUTTON_HEIGHT = 50;
     private final int BUTTON_SPACE = 50;
     private final int BUTTON_FONT_SIZE = 30;
+    private final int START_WIDTH = 600;
+    private final int START_HEIGHT = 300;
+    private final int START_FONT_SIZE = 100;
 
     private final int M_WIDTH = B_WIDTH - BUTTON_WIDTH - 2 * BUTTON_SPACE;
     private final int M_HEIGHT = B_HEIGHT - TOPBAR;
@@ -36,9 +39,9 @@ public class Board extends JPanel implements ActionListener, MouseListener {
     private final int GOALSIZE = 10;
     private final double WALLRATE = 0.05;
 
-    private int creationFlag = 0;
+    private int creationFlag = -1;
 
-    private int step = 1;
+    private int step = 0;
 
     private final double EllersChance = 0.5;
 
@@ -234,8 +237,32 @@ public class Board extends JPanel implements ActionListener, MouseListener {
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
         Graphics2D g2 = (Graphics2D) g;
-        drawMaze(g2);
-        drawButtons(g2);
+        if (step == 0)
+            drawStart(g2);
+        else{
+            drawMaze(g2);
+            drawButtons(g2);
+        }
+    }
+
+    private void drawStart(Graphics2D g){
+        Color wordC = WallColor, inC = ButtonColor, markedC = SearchedColor;
+        double mx = MouseInfo.getPointerInfo().getLocation().getX() - getLocationOnScreen().getX(), my = MouseInfo.getPointerInfo().getLocation().getY() - getLocationOnScreen().getY();
+        int y = B_HEIGHT / 2 - START_HEIGHT / 2;
+        int x = B_WIDTH / 2 - START_WIDTH / 2;
+        int arcWidth = 50;
+        int arcHeight = 50;
+        g.setFont(new Font("Ariel", Font.PLAIN, START_FONT_SIZE));
+        int spaceX = (int) (0.5 * g.getFont().getSize());
+        int spaceY = START_HEIGHT / 2 + g.getFont().getSize() / 2;
+        if (mx >= x && mx <= x + START_WIDTH && my >= y && my <= y + START_HEIGHT) {
+            g.setColor(markedC);
+        } else
+            g.setColor(inC);
+        g.fillRoundRect(x, y, START_WIDTH, START_HEIGHT, arcWidth, arcHeight);
+        g.setColor(wordC);
+        g.drawString("   START", x + spaceX, y + spaceY);
+        g.drawRoundRect(x, y, START_WIDTH, START_HEIGHT, arcWidth, arcHeight);
     }
 
     private void drawMaze(Graphics2D g) {
@@ -543,7 +570,12 @@ public class Board extends JPanel implements ActionListener, MouseListener {
 
     @Override
     public void mouseClicked(MouseEvent e) {
-        double x = MouseInfo.getPointerInfo().getLocation().getX() - getLocationOnScreen().getX(), y = MouseInfo.getPointerInfo().getLocation().getY() - getLocationOnScreen().getY();
+        double x = e.getX(), y = e.getY();
+        if (step == 0){
+            if (B_HEIGHT / 2 - START_HEIGHT / 2 <= y && B_HEIGHT / 2 + START_HEIGHT / 2 >= y && x >= B_WIDTH / 2 - START_WIDTH / 2 && x <= B_WIDTH / 2 + START_WIDTH / 2)
+                step = 1;
+            return;
+        }
         int xs = B_WIDTH - (B_WIDTH - (cells.length * CELLSIZE)) / 2 - BUTTON_WIDTH / 2, ys = 0;
         if (x >= xs && x <= xs + BUTTON_WIDTH) {
             for (int i = 0; i < 5; i++) {
