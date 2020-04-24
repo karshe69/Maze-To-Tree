@@ -17,34 +17,37 @@ public class Board extends JPanel implements ActionListener, MouseListener {
     private final int B_WIDTH = (int) tk.getScreenSize().getWidth(); // width of the screen
     private final int B_HEIGHT = (int) tk.getScreenSize().getHeight(); // height of the screen
 
-    private final int TOPBAR = 30;
-    private final int BUTTON_WIDTH = 200;
-    private final int BUTTON_HEIGHT = 50;
-    private final int BUTTON_SPACE = 50;
-    private final int BUTTON_FONT_SIZE = 30;
-    private final int START_WIDTH = 600;
-    private final int START_HEIGHT = 300;
-    private final int START_FONT_SIZE = 100;
+    private final int TOPBAR = 30; // size of the top bar of the actual window. used for aesthetic reasons.
+    private final int START_WIDTH = 600; // width of the start button
+    private final int START_HEIGHT = 300; // height of the start button
+    private final int START_FONT_SIZE = 100; // font of the start button
+    private final int BUTTON_WIDTH = 200; // width of all of the other buttons
+    private final int BUTTON_HEIGHT = 50; // height of all the other buttons
+    private final int BUTTON_SPACE = 50; // space between the buttons and the maze
+    private final int BUTTON_FONT_SIZE = 30; // font size of the buttons
 
-    private final int M_WIDTH = B_WIDTH - BUTTON_WIDTH - 2 * BUTTON_SPACE;
-    private final int M_HEIGHT = B_HEIGHT - TOPBAR;
 
-    private final int DELAY1 = 20;
-    private final int DELAY2 = 20;
-    private final int DELAYE = 300;
+    private final int M_WIDTH = B_WIDTH - BUTTON_WIDTH - 2 * BUTTON_SPACE; // width of the actual maze part of the screen
+    private final int M_HEIGHT = B_HEIGHT - TOPBAR; // height of the actual maze part of the screen
 
-    private final double CellToWallRatio = 0.9;
-    private final int CELLSIZE = 50;
-    private final int MOVINGRATE = 15;
-    private final int GOALSIZE = 10;
-    private final double WALLRATE = 0.05;
+    private final int DELAY1 = 20; // tick delay for creating the maze
+    private final int DELAYE = 300; // tick delay while creating an eller's maze
+    private final int DELAY2 = 20; // tick delay for all other stuff
 
-    private int creationFlag = -1;
+    private final double CellToWallRatio = 0.9; // the ratio between the maze cell and its wall
+    private final int CELLSIZE = 50; // the size of the maze cells
+    private final int MOVINGRATE = 15; // amount of pixels that move each tick while creating the tree
+    private final int NODESIZE = 10; // tree node size
+    private final double WALLRATE = 0.05; // the amount of CellToWallRatio decreas in transforming cells each tick
 
-    private int step = 0;
+    private int creationFlag = -1; //type of maze: 0 = prim's, 1 = kruskal's, 2 = random dfs, 3 = eller's, willson's
 
-    private final double EllersChance = 0.5;
+    private int step = 0; // step of progression in the programer. 0 = start button, 1 = initialization , 2 = creating the maze, 3 & 4 = maze is done, 5 = change the position of the start, 6 = change the position of the end, 7 & 8 = turn maze to tree, 9 = tree is done, 10 = solve maze.
 
+    private final double EllersChance = 0.5; // chance for a connection to be made in an eller's maze
+
+
+    //colors for the game aesthetic
     private final Color CellColor = new Color(34, 53, 64);
     private final Color WallColor = new Color(169, 184, 201);
     private final Color StartColor = new Color(0, 184, 140);
@@ -53,6 +56,7 @@ public class Board extends JPanel implements ActionListener, MouseListener {
     private final Color SearchColor = new Color(116, 174, 144);
     private final Color ButtonColor = new Color(44, 70, 89);
 
+    // current x and y of the mouse
     private double mouseX = 0;
     private double mouseY = 0;
 
@@ -62,11 +66,13 @@ public class Board extends JPanel implements ActionListener, MouseListener {
     private int finishX;
     private int finishY;
 
-    private MazeCell[][] cells = new MazeCell[M_WIDTH / CELLSIZE][M_HEIGHT / CELLSIZE];
+    private MazeCell[][] cells = new MazeCell[M_WIDTH / CELLSIZE][M_HEIGHT / CELLSIZE]; // the cells of the maze
+
+    private Timer timer; // the program updates itself using this timer every.
+
+    // all of the below are used for maze creating / solving.
 
     private ArrayList<Cell> trees = new ArrayList<>();
-
-    private Timer timer;
 
     private int[][] intCells = new int[cells.length][cells[0].length]; // for dfs
 
@@ -83,7 +89,7 @@ public class Board extends JPanel implements ActionListener, MouseListener {
 
     Random rnd = new Random();
 
-    public Board() {
+    public Board() { // creates the jpanel and the timer
         setPreferredSize(new Dimension(B_WIDTH, B_HEIGHT)); // sets screen size
         setBackground(CellColor);
         addMouseListener(this);
@@ -92,13 +98,15 @@ public class Board extends JPanel implements ActionListener, MouseListener {
     }
 
     @Override
-    public void actionPerformed(ActionEvent e) {
+    public void actionPerformed(ActionEvent e) { // every tick this function is called
         boolean stepF = false;
-        if (step < -1000) {
+        if (step < -1000) { // if the program is on stop mode and it was pressed on step.
             stepF = true;
             step += 1000;
             step *= -1;
         }
+
+        // explanation for what happends each step is in the step description and in the functions which are used.
         if (step == 1 || step == -1) {
             binHelp.clear();
             binHelp1.clear();
@@ -204,13 +212,13 @@ public class Board extends JPanel implements ActionListener, MouseListener {
             }
         }
 
-        if (step == 8)
+        if (step == 7)
             if (trees.get(0).getCellToWallRatio() == 0) {
                 trees.add(new TreeCell((TransformingCell) trees.remove(0)));
-                step = 9;
+                step = 8;
             }
 
-        if (step == 9) {
+        if (step == 8) {
             boolean flag = true;
             for (MazeCell[] cll : cells)
                 for (MazeCell cell : cll)
@@ -221,11 +229,11 @@ public class Board extends JPanel implements ActionListener, MouseListener {
                         }
 
             if (flag) {
-                step = 10;
+                step = 9;
             }
         }
 
-        if (step == 11)
+        if (step == 10)
             best_first_search();
 
         repaint();
@@ -234,18 +242,18 @@ public class Board extends JPanel implements ActionListener, MouseListener {
     }
 
     @Override
-    public void paintComponent(Graphics g) {
+    public void paintComponent(Graphics g) { // calls for the drawing functions to put stuff on screen.
         super.paintComponent(g);
         Graphics2D g2 = (Graphics2D) g;
         if (step == 0)
             drawStart(g2);
         else{
             drawMaze(g2);
-            drawButtons(g2);
+            menuButtons(g2);
         }
     }
 
-    private void drawStart(Graphics2D g){
+    private void drawStart(Graphics2D g){ // draws the start button
         Color wordC = WallColor, inC = ButtonColor, markedC = SearchedColor;
         double mx = MouseInfo.getPointerInfo().getLocation().getX() - getLocationOnScreen().getX(), my = MouseInfo.getPointerInfo().getLocation().getY() - getLocationOnScreen().getY();
         int y = B_HEIGHT / 2 - START_HEIGHT / 2;
@@ -265,8 +273,8 @@ public class Board extends JPanel implements ActionListener, MouseListener {
         g.drawRoundRect(x, y, START_WIDTH, START_HEIGHT, arcWidth, arcHeight);
     }
 
-    private void drawMaze(Graphics2D g) {
-        if (step == 8 || step == 9)
+    private void drawMaze(Graphics2D g) { // draws the maze
+        if (step == 7 || step == 8 || step == -7 || step == -8)
             for (MazeCell[] cll : cells)
                 for (MazeCell cell : cll)
                     cell.draw(g);
@@ -274,15 +282,15 @@ public class Board extends JPanel implements ActionListener, MouseListener {
             cell.draw(g);
         for (Cell cell : trees)
             cell.resetDrawn();
-        if (step == 8)
+        if (step == 7 || step == -7)
             ((TransformingCell) trees.get(0)).move();
-        if (step == 9)
+        if (step == 8 || step == -8)
             ((TreeCell) trees.get(0)).move();
         g.setColor(WallColor);
         g.drawRect(0, 0, cells.length * CELLSIZE, cells[0].length * CELLSIZE);
     }
 
-    private void drawButtons(Graphics2D g) {
+    private void menuButtons(Graphics2D g) { //draws the menu
         Color wordC = WallColor, inC = ButtonColor, unavailableC = CellColor, markedC = SearchedColor;
         int x = B_WIDTH - (B_WIDTH - (cells.length * CELLSIZE)) / 2 - BUTTON_WIDTH / 2, y = 0;
         int spaceX = (int) (0.5 * g.getFont().getSize()), spaceY = BUTTON_HEIGHT - (int) (0.3 * g.getFont().getSize()), arcWidth = 10, arcHeight = 10;
@@ -429,7 +437,7 @@ public class Board extends JPanel implements ActionListener, MouseListener {
         g.drawRoundRect(x, y, BUTTON_WIDTH, BUTTON_HEIGHT, arcWidth, arcHeight);
 
         y += (int) (0.5 * BUTTON_SPACE) + BUTTON_HEIGHT;
-        if (step != 10)
+        if (step != 9)
             g.setColor(unavailableC);
         else if (mx >= x && mx <= x + BUTTON_WIDTH && my >= y && my <= y + BUTTON_HEIGHT) {
             g.setColor(markedC);
@@ -441,11 +449,11 @@ public class Board extends JPanel implements ActionListener, MouseListener {
         g.drawRoundRect(x, y, BUTTON_WIDTH, BUTTON_HEIGHT, arcWidth, arcHeight);
     }
 
-    private int binSearchH(Double in, ArrayList<Double> arr) {
-        return binSearch(arr, in, 0, arr.size() - 1);
+    private int binSearch(Double in, ArrayList<Double> arr) { // binary search
+        return binSearchH(arr, in, 0, arr.size() - 1);
     }
 
-    private int binSearch(ArrayList<Double> arr, Double in, int start, int finish) {
+    private int binSearchH(ArrayList<Double> arr, Double in, int start, int finish) { // helps with binary search
         if (start > finish)
             return start;
         if (start == finish) {
@@ -462,28 +470,28 @@ public class Board extends JPanel implements ActionListener, MouseListener {
         }
         int i = (start + finish) / 2;
         if (in > arr.get(i))
-            return binSearch(arr, in, i, finish);
+            return binSearchH(arr, in, i, finish);
         if (in < arr.get(i))
-            return binSearch(arr, in, start, i);
+            return binSearchH(arr, in, start, i);
         return i;
     }
 
-    public void best_first_search() {
+    public void best_first_search() { // Best First Search over the tree
         TreeCell searching = searchCells.remove(0);
         double value = binHelp.remove(0);
         if (searching.getArrX() == finishX && searching.getArrY() == finishY) {
-            step = 10;
+            step = 9;
             return;
         }
         searching.colorBackwards(SearchedColor, SearchColor);
-        int index = binSearchH(value, binHelp1);
+        int index = binSearch(value, binHelp1);
         binHelp1.add(index, value);
         searchedCells.add(index, searching);
         for (Transition transition : searching.getTransitions())
             if (transition != null)
                 if (!treeCellExistsIn((TreeCell) transition.getCells()[1], searchedCells, binHelp1)) {
                     value = evaluate((TreeCell) transition.getCells()[1]);
-                    index = binSearchH(value, binHelp);
+                    index = binSearch(value, binHelp);
                     binHelp.add(index, value);
                     searchCells.add(index, (TreeCell) transition.getCells()[1]);
                 }
@@ -491,9 +499,9 @@ public class Board extends JPanel implements ActionListener, MouseListener {
         searchCells.get(0).colorBackwards(SearchColor, SearchedColor);
     }
 
-    public boolean treeCellExistsIn(TreeCell query, ArrayList<TreeCell> list, ArrayList<Double> arrL) {
+    public boolean treeCellExistsIn(TreeCell query, ArrayList<TreeCell> list, ArrayList<Double> arrL) { //finds if a tree cell exsits in list, with arrL as the thing that lets bin search the list
         double value = evaluate(query);
-        int index = binSearchH(value, arrL);
+        int index = binSearch(value, arrL);
         if (index >= arrL.size())
             return false;
         for (; index > 0 && arrL.get(index - 1) == value; index--) ;
@@ -507,7 +515,7 @@ public class Board extends JPanel implements ActionListener, MouseListener {
         int x = query.getArrX() - finishX;
         int y = query.getArrY() - finishY;
         return x * x + y * y;
-    }
+    } // evaluation function for the query
 
     public void resetCells() {
         for (int i = 0; i < cells.length; i++)
@@ -515,7 +523,7 @@ public class Board extends JPanel implements ActionListener, MouseListener {
                 cells[i][j] = new MazeCell(i, j, CELLSIZE, CellToWallRatio, WallColor, CellColor);
                 cells[i][j].setDrawn(true);
             }
-    }
+    } // resets the cells of the maze
 
     public void resetPaths() {
         MTMTransition trn;
@@ -525,13 +533,13 @@ public class Board extends JPanel implements ActionListener, MouseListener {
                 for (int k = 0; k <= 1; k++)
                     if (i + k < cells.length && j + (1 - k) < cells[i].length) {
                         trn = new MTMTransition(cells[i][j], cells[i + k][j + (1 - k)], CellColor, CELLSIZE, CellToWallRatio);
-                        ind = binSearchH(trn.getWeight(), binHelp);
+                        ind = binSearch(trn.getWeight(), binHelp);
                         paths.add(ind, trn);
                         binHelp.add(ind, trn.getWeight());
                     }
-    }
+    } // makes a full list of paths filled with all possible paths in the maze
 
-    public void ellersHelper(int a, int b) {
+    public void ellersHelper(int a, int b) { // changes all the variables with the value of a to b in intCells
         for (int i = 0; i < cells.length; i++)
             for (int j = 0; j <= startY; j++)
                 if (intCells[i][j] == a)
@@ -544,38 +552,40 @@ public class Board extends JPanel implements ActionListener, MouseListener {
         int i;
         if (x > 0) {
             path = new MTMTransition(cells[x][y], cells[x - 1][y], CellColor, CELLSIZE, CellToWallRatio);
-            i = binSearchH(path.getWeight(), list);
+            i = binSearch(path.getWeight(), list);
             list.add(i, path.getWeight());
             paths.add(i, path);
         }
         if (y > 0) {
             path = new MTMTransition(cells[x][y], cells[x][y - 1], CellColor, CELLSIZE, CellToWallRatio);
-            i = binSearchH(path.getWeight(), list);
+            i = binSearch(path.getWeight(), list);
             list.add(i, path.getWeight());
             paths.add(i, path);
         }
         if (x + 1 < cells.length) {
             path = new MTMTransition(cells[x][y], cells[x + 1][y], CellColor, CELLSIZE, CellToWallRatio);
-            i = binSearchH(path.getWeight(), list);
+            i = binSearch(path.getWeight(), list);
             list.add(i, path.getWeight());
             paths.add(i, path);
         }
         if (y + 1 < cells[0].length) {
             path = new MTMTransition(cells[x][y], cells[x][y + 1], CellColor, CELLSIZE, CellToWallRatio);
-            i = binSearchH(path.getWeight(), list);
+            i = binSearch(path.getWeight(), list);
             list.add(i, path.getWeight());
             paths.add(i, path);
         }
-    }
+    } // adds the paths between cell and his surronding into the global variable paths
 
     @Override
-    public void mouseClicked(MouseEvent e) {
+    public void mouseClicked(MouseEvent e) { // checks all of the button clicks
         double x = e.getX(), y = e.getY();
-        if (step == 0){
+        if (step == 0){ // start button
             if (B_HEIGHT / 2 - START_HEIGHT / 2 <= y && B_HEIGHT / 2 + START_HEIGHT / 2 >= y && x >= B_WIDTH / 2 - START_WIDTH / 2 && x <= B_WIDTH / 2 + START_WIDTH / 2)
                 step = 1;
             return;
         }
+
+        // menu
         int xs = B_WIDTH - (B_WIDTH - (cells.length * CELLSIZE)) / 2 - BUTTON_WIDTH / 2, ys = 0;
         if (x >= xs && x <= xs + BUTTON_WIDTH) {
             for (int i = 0; i < 5; i++) {
@@ -624,16 +634,16 @@ public class Board extends JPanel implements ActionListener, MouseListener {
             ys += (int) (0.5 * BUTTON_SPACE) + BUTTON_HEIGHT;
             if (y >= ys && y <= ys + BUTTON_HEIGHT && step == 4) {
                 trees.remove(0);
-                trees.add(new TransformingCell(cells[startX][startY], MOVINGRATE, WALLRATE, 0, 0, GOALSIZE, M_HEIGHT, M_WIDTH, treeSize));
+                trees.add(new TransformingCell(cells[startX][startY], MOVINGRATE, WALLRATE, 0, 0, NODESIZE, M_HEIGHT, M_WIDTH, treeSize));
                 treeSize.add(0, 1);
                 for (int i = 0; i < 15; i++)
                     treeSize.add(treeSize.size(), 0);
-                step = 8;
+                step = 7;
             }
 
             ys += (int) (0.5 * BUTTON_SPACE) + BUTTON_HEIGHT;
-            if (y >= ys && y <= ys + BUTTON_HEIGHT && step == 10) {
-                step = 11;
+            if (y >= ys && y <= ys + BUTTON_HEIGHT && step == 9) {
+                step = 10;
                 binHelp.clear();
                 binHelp1.clear();
                 searchCells.clear();
@@ -696,7 +706,7 @@ public class Board extends JPanel implements ActionListener, MouseListener {
 
     }
 
-    // maze creating algorithms:
+    // maze creating algorithms: all of this algorithms will do one step in the specified algorithm each time they are called.
 
     public void primStep() {
         if (paths.isEmpty()) {
