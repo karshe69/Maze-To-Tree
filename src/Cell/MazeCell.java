@@ -30,14 +30,13 @@ public class MazeCell extends Cell{
 
     public void delTrans(MTMTransition transition){
         for (int i = 0; i < transitions.length; i++) {
-            if (transition.equals(transitions[i]))
-                transitions[i] = null;
+            if (transitions[i] != null)
+                if (transition.equals(transitions[i]))
+                    transitions[i] = null;
         }
     }
 
     public boolean dfsShell(MazeCell cell){
-        System.out.println(cell.getArrX() + " " + cell.getArrY());
-        System.out.println(arrX + " " + arrY);
         resetSearched();
         return dfs(cell);
     }

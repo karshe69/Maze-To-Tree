@@ -91,12 +91,12 @@ public class Board extends JPanel implements ActionListener, MouseListener {
     @Override
     public void actionPerformed(ActionEvent e) {
         boolean stepF = false;
-        if (step<-1000){
+        if (step < -1000) {
             stepF = true;
             step += 1000;
             step *= -1;
         }
-        if (step == 1 || step == -1){
+        if (step == 1 || step == -1) {
             binHelp.clear();
             binHelp1.clear();
             paths.clear();
@@ -108,10 +108,10 @@ public class Board extends JPanel implements ActionListener, MouseListener {
             finishX = cells.length - 1;
             finishY = cells[0].length - 1;
             timer.setDelay(DELAY1);
-            if (creationFlag == 0){
+            if (creationFlag == 0) {
                 startX = rnd.nextInt(cells.length);
                 startY = rnd.nextInt(cells[startX].length);
-                for (int[] clls:intCells)
+                for (int[] clls : intCells)
                     Arrays.fill(clls, 0);
                 intCells[startX][startY] = -1;
                 trees.add(cells[startX][startY]);
@@ -119,21 +119,29 @@ public class Board extends JPanel implements ActionListener, MouseListener {
             }
             if (creationFlag == 1)
                 resetPaths();
-            if (creationFlag == 2){
+            if (creationFlag == 2) {
                 startX = rnd.nextInt(cells.length);
                 startY = rnd.nextInt(cells[startX].length);
                 intCells[startX][startY] = -1;
                 trees.add(cells[startX][startY]);
             }
-            if (creationFlag == 3){
-                for (int[] clls:intCells)
+            if (creationFlag == 3) {
+                for (int[] clls : intCells)
                     Arrays.fill(clls, 0);
                 timer.setDelay(DELAYE);
+            }
+            if (creationFlag == 4) {
+                for (int[] clls : intCells)
+                    Arrays.fill(clls, 0);
+                startX = 0;
+                startY = 0;
+                trees.add(0, cells[0][0]);
+                intCells[0][0] = -1;
             }
             if (step == 1)
                 step = 2;
         }
-        if (step == 2){
+        if (step == 2) {
             if (creationFlag == 0)
                 primStep();
             if (creationFlag == 1)
@@ -143,10 +151,10 @@ public class Board extends JPanel implements ActionListener, MouseListener {
             if (creationFlag == 3)
                 ellerStep();
             if (creationFlag == 4)
-                recursiveDivisionStep();
+                wilsonStep();
         }
 
-        if (step == 3){
+        if (step == 3) {
             while (trees.size() > 1)
                 trees.remove(0);
             timer.setDelay(DELAY2);
@@ -157,59 +165,59 @@ public class Board extends JPanel implements ActionListener, MouseListener {
             step = 4;
         }
 
-        if (step == 5){
+        if (step == 5) {
             double x = MouseInfo.getPointerInfo().getLocation().getX() - getLocationOnScreen().getX(), y = MouseInfo.getPointerInfo().getLocation().getY() - getLocationOnScreen().getY();
-            if ((int)(mouseX/CELLSIZE) != finishX || (int)(mouseY/CELLSIZE) != finishY){
-                cells[(int)(mouseX/CELLSIZE)][(int)(mouseY/CELLSIZE)].setCellColor(CellColor);
-                cells[(int)(mouseX/CELLSIZE)][(int)(mouseY/CELLSIZE)].setWallColor(WallColor);
+            if ((int) (mouseX / CELLSIZE) != finishX || (int) (mouseY / CELLSIZE) != finishY) {
+                cells[(int) (mouseX / CELLSIZE)][(int) (mouseY / CELLSIZE)].setCellColor(CellColor);
+                cells[(int) (mouseX / CELLSIZE)][(int) (mouseY / CELLSIZE)].setWallColor(WallColor);
             }
-            if(0 <= x/CELLSIZE && x/CELLSIZE < cells.length && 0 <= y/CELLSIZE && y/CELLSIZE < cells[0].length) {
+            if (0 <= x / CELLSIZE && x / CELLSIZE < cells.length && 0 <= y / CELLSIZE && y / CELLSIZE < cells[0].length) {
                 mouseX = x;
                 mouseY = y;
-                if (cells[(int)(x/CELLSIZE)][(int)(y/CELLSIZE)].getCellColor() == CellColor){
-                    cells[(int)(mouseX/CELLSIZE)][(int)(mouseY/CELLSIZE)].setCellColor(StartColor);
-                    cells[(int)(mouseX/CELLSIZE)][(int)(mouseY/CELLSIZE)].setWallColor(StartColor);
-                    startX = (int)(mouseX/CELLSIZE);
-                    startY = (int)(mouseY/CELLSIZE);
+                if (cells[(int) (x / CELLSIZE)][(int) (y / CELLSIZE)].getCellColor() == CellColor) {
+                    cells[(int) (mouseX / CELLSIZE)][(int) (mouseY / CELLSIZE)].setCellColor(StartColor);
+                    cells[(int) (mouseX / CELLSIZE)][(int) (mouseY / CELLSIZE)].setWallColor(StartColor);
+                    startX = (int) (mouseX / CELLSIZE);
+                    startY = (int) (mouseY / CELLSIZE);
                 }
             }
         }
 
-        if (step == 6){
+        if (step == 6) {
             double x = MouseInfo.getPointerInfo().getLocation().getX() - getLocationOnScreen().getX(), y = MouseInfo.getPointerInfo().getLocation().getY() - getLocationOnScreen().getY();
-            if ((int)(mouseX/CELLSIZE) != startX || (int)(mouseY/CELLSIZE) != startY){
-                cells[(int)(mouseX/CELLSIZE)][(int)(mouseY/CELLSIZE)].setCellColor(CellColor);
-                cells[(int)(mouseX/CELLSIZE)][(int)(mouseY/CELLSIZE)].setWallColor(WallColor);
+            if ((int) (mouseX / CELLSIZE) != startX || (int) (mouseY / CELLSIZE) != startY) {
+                cells[(int) (mouseX / CELLSIZE)][(int) (mouseY / CELLSIZE)].setCellColor(CellColor);
+                cells[(int) (mouseX / CELLSIZE)][(int) (mouseY / CELLSIZE)].setWallColor(WallColor);
             }
-            if(0 <= x/CELLSIZE && x/CELLSIZE < cells.length && 0 <= y/CELLSIZE && y/CELLSIZE < cells[0].length){
+            if (0 <= x / CELLSIZE && x / CELLSIZE < cells.length && 0 <= y / CELLSIZE && y / CELLSIZE < cells[0].length) {
                 mouseX = x;
                 mouseY = y;
-                if (cells[(int)(x/CELLSIZE)][(int)(y/CELLSIZE)].getCellColor() == CellColor){
-                    cells[(int)(mouseX/CELLSIZE)][(int)(mouseY/CELLSIZE)].setCellColor(FinishColor);
-                    cells[(int)(mouseX/CELLSIZE)][(int)(mouseY/CELLSIZE)].setWallColor(FinishColor);
-                    finishX = (int)(mouseX/CELLSIZE);
-                    finishY = (int)(mouseY/CELLSIZE);
+                if (cells[(int) (x / CELLSIZE)][(int) (y / CELLSIZE)].getCellColor() == CellColor) {
+                    cells[(int) (mouseX / CELLSIZE)][(int) (mouseY / CELLSIZE)].setCellColor(FinishColor);
+                    cells[(int) (mouseX / CELLSIZE)][(int) (mouseY / CELLSIZE)].setWallColor(FinishColor);
+                    finishX = (int) (mouseX / CELLSIZE);
+                    finishY = (int) (mouseY / CELLSIZE);
                 }
             }
         }
 
         if (step == 8)
-            if (trees.get(0).getCellToWallRatio() == 0){
+            if (trees.get(0).getCellToWallRatio() == 0) {
                 trees.add(new TreeCell((TransformingCell) trees.remove(0)));
                 step = 9;
             }
 
-        if (step == 9){
+        if (step == 9) {
             boolean flag = true;
-            for (MazeCell[] cll:cells)
-                for (MazeCell cell:cll)
-                    for (Transition trans:cell.getTransitions())
+            for (MazeCell[] cll : cells)
+                for (MazeCell cell : cll)
+                    for (Transition trans : cell.getTransitions())
                         if (trans != null) {
                             flag = false;
                             break;
                         }
 
-            if (flag){
+            if (flag) {
                 step = 10;
             }
         }
@@ -232,25 +240,25 @@ public class Board extends JPanel implements ActionListener, MouseListener {
 
     private void drawMaze(Graphics2D g) {
         if (step == 8 || step == 9)
-            for (MazeCell[] cll:cells)
-                for (MazeCell cell:cll)
+            for (MazeCell[] cll : cells)
+                for (MazeCell cell : cll)
                     cell.draw(g);
-        for (Cell cell:trees)
+        for (Cell cell : trees)
             cell.draw(g);
-        for (Cell cell:trees)
+        for (Cell cell : trees)
             cell.resetDrawn();
         if (step == 8)
-            ((TransformingCell)trees.get(0)).move();
+            ((TransformingCell) trees.get(0)).move();
         if (step == 9)
-            ((TreeCell)trees.get(0)).move();
+            ((TreeCell) trees.get(0)).move();
         g.setColor(WallColor);
         g.drawRect(0, 0, cells.length * CELLSIZE, cells[0].length * CELLSIZE);
     }
 
-    private void drawButtons(Graphics2D g){
+    private void drawButtons(Graphics2D g) {
         Color wordC = WallColor, inC = ButtonColor, unavailableC = CellColor, markedC = SearchedColor;
         int x = B_WIDTH - (B_WIDTH - (cells.length * CELLSIZE)) / 2 - BUTTON_WIDTH / 2, y = 0;
-        int spaceX = (int)(0.5 * g.getFont().getSize()), spaceY = BUTTON_HEIGHT - (int)(0.3 * g.getFont().getSize()), arcWidth = 10, arcHeight = 10;
+        int spaceX = (int) (0.5 * g.getFont().getSize()), spaceY = BUTTON_HEIGHT - (int) (0.3 * g.getFont().getSize()), arcWidth = 10, arcHeight = 10;
         double mx = MouseInfo.getPointerInfo().getLocation().getX() - getLocationOnScreen().getX(), my = MouseInfo.getPointerInfo().getLocation().getY() - getLocationOnScreen().getY();
 
         g.setColor(wordC);
@@ -258,64 +266,59 @@ public class Board extends JPanel implements ActionListener, MouseListener {
         Map attributes = g.getFont().getAttributes();
         attributes.put(TextAttribute.UNDERLINE, TextAttribute.UNDERLINE_ON);
         g.setFont(g.getFont().deriveFont(attributes));
-        y += (int)(0.1 * BUTTON_SPACE);
+        y += (int) (0.1 * BUTTON_SPACE);
         g.drawString("Maze Types", x + spaceX, y + spaceY);
 
 
         g.setFont(new Font("Ariel", Font.PLAIN, BUTTON_FONT_SIZE));
-        y += (int)(0.4 * BUTTON_SPACE) + BUTTON_HEIGHT;
-        if (mx >= x && mx <= x + BUTTON_WIDTH && my >= y && my <= y + BUTTON_HEIGHT){
+        y += (int) (0.4 * BUTTON_SPACE) + BUTTON_HEIGHT;
+        if (mx >= x && mx <= x + BUTTON_WIDTH && my >= y && my <= y + BUTTON_HEIGHT) {
             g.setColor(markedC);
-        }
-        else
+        } else
             g.setColor(inC);
         g.fillRoundRect(x, y, BUTTON_WIDTH, BUTTON_HEIGHT, arcWidth, arcHeight);
         g.setColor(wordC);
         g.drawString("Prim's", x + spaceX, y + spaceY);
         g.drawRoundRect(x, y, BUTTON_WIDTH, BUTTON_HEIGHT, arcWidth, arcHeight);
 
-        y += (int)(0.5 * BUTTON_SPACE) + BUTTON_HEIGHT;
-        if (mx >= x && mx <= x + BUTTON_WIDTH && my >= y && my <= y + BUTTON_HEIGHT){
+        y += (int) (0.5 * BUTTON_SPACE) + BUTTON_HEIGHT;
+        if (mx >= x && mx <= x + BUTTON_WIDTH && my >= y && my <= y + BUTTON_HEIGHT) {
             g.setColor(markedC);
-        }
-        else
+        } else
             g.setColor(inC);
         g.fillRoundRect(x, y, BUTTON_WIDTH, BUTTON_HEIGHT, arcWidth, arcHeight);
         g.setColor(wordC);
         g.drawString("Kruskal's", x + spaceX, y + spaceY);
         g.drawRoundRect(x, y, BUTTON_WIDTH, BUTTON_HEIGHT, arcWidth, arcHeight);
 
-        y += (int)(0.5 * BUTTON_SPACE) + BUTTON_HEIGHT;
-        if (mx >= x && mx <= x + BUTTON_WIDTH && my >= y && my <= y + BUTTON_HEIGHT){
+        y += (int) (0.5 * BUTTON_SPACE) + BUTTON_HEIGHT;
+        if (mx >= x && mx <= x + BUTTON_WIDTH && my >= y && my <= y + BUTTON_HEIGHT) {
             g.setColor(markedC);
-        }
-        else
+        } else
             g.setColor(inC);
         g.fillRoundRect(x, y, BUTTON_WIDTH, BUTTON_HEIGHT, arcWidth, arcHeight);
         g.setColor(wordC);
         g.drawString("DFS", x + spaceX, y + spaceY);
         g.drawRoundRect(x, y, BUTTON_WIDTH, BUTTON_HEIGHT, arcWidth, arcHeight);
 
-        y += (int)(0.5 * BUTTON_SPACE) + BUTTON_HEIGHT;
-        if (mx >= x && mx <= x + BUTTON_WIDTH && my >= y && my <= y + BUTTON_HEIGHT){
+        y += (int) (0.5 * BUTTON_SPACE) + BUTTON_HEIGHT;
+        if (mx >= x && mx <= x + BUTTON_WIDTH && my >= y && my <= y + BUTTON_HEIGHT) {
             g.setColor(markedC);
-        }
-        else
+        } else
             g.setColor(inC);
         g.fillRoundRect(x, y, BUTTON_WIDTH, BUTTON_HEIGHT, arcWidth, arcHeight);
         g.setColor(wordC);
         g.drawString("Eller's", x + spaceX, y + spaceY);
         g.drawRoundRect(x, y, BUTTON_WIDTH, BUTTON_HEIGHT, arcWidth, arcHeight);
 
-        y += (int)(0.5 * BUTTON_SPACE) + BUTTON_HEIGHT;
-        if (mx >= x && mx <= x + BUTTON_WIDTH && my >= y && my <= y + BUTTON_HEIGHT){
+        y += (int) (0.5 * BUTTON_SPACE) + BUTTON_HEIGHT;
+        if (mx >= x && mx <= x + BUTTON_WIDTH && my >= y && my <= y + BUTTON_HEIGHT) {
             g.setColor(markedC);
-        }
-        else
+        } else
             g.setColor(inC);
         g.fillRoundRect(x, y, BUTTON_WIDTH, BUTTON_HEIGHT, arcWidth, arcHeight);
         g.setColor(wordC);
-        g.drawString("Rec Dev", x + spaceX, y + spaceY);
+        g.drawString("Wilson's", x + spaceX, y + spaceY);
         g.drawRoundRect(x, y, BUTTON_WIDTH, BUTTON_HEIGHT, arcWidth, arcHeight);
 
 
@@ -323,16 +326,15 @@ public class Board extends JPanel implements ActionListener, MouseListener {
         attributes = g.getFont().getAttributes();
         attributes.put(TextAttribute.UNDERLINE, TextAttribute.UNDERLINE_ON);
         g.setFont(g.getFont().deriveFont(attributes));
-        y += (int)(0.3 * BUTTON_SPACE) + BUTTON_HEIGHT;
+        y += (int) (0.3 * BUTTON_SPACE) + BUTTON_HEIGHT;
         g.drawString("Functions", x + spaceX, y + spaceY);
 
 
         g.setFont(new Font("Ariel", Font.PLAIN, BUTTON_FONT_SIZE));
-        y += (int)(0.4 * BUTTON_SPACE) + BUTTON_HEIGHT;
-        if (mx >= x && mx <= x + BUTTON_WIDTH && my >= y && my <= y + BUTTON_HEIGHT){
+        y += (int) (0.4 * BUTTON_SPACE) + BUTTON_HEIGHT;
+        if (mx >= x && mx <= x + BUTTON_WIDTH && my >= y && my <= y + BUTTON_HEIGHT) {
             g.setColor(markedC);
-        }
-        else
+        } else
             g.setColor(inC);
         g.fillRoundRect(x, y, BUTTON_WIDTH, BUTTON_HEIGHT, arcWidth, arcHeight);
         g.setColor(wordC);
@@ -343,74 +345,68 @@ public class Board extends JPanel implements ActionListener, MouseListener {
 
         g.drawRoundRect(x, y, BUTTON_WIDTH, BUTTON_HEIGHT, arcWidth, arcHeight);
 
-        y += (int)(0.5 * BUTTON_SPACE) + BUTTON_HEIGHT;
-        if (mx >= x && mx <= x + BUTTON_WIDTH && my >= y && my <= y + BUTTON_HEIGHT){
+        y += (int) (0.5 * BUTTON_SPACE) + BUTTON_HEIGHT;
+        if (mx >= x && mx <= x + BUTTON_WIDTH && my >= y && my <= y + BUTTON_HEIGHT) {
             g.setColor(markedC);
-        }
-        else
+        } else
             g.setColor(inC);
         g.fillRoundRect(x, y, BUTTON_WIDTH, BUTTON_HEIGHT, arcWidth, arcHeight);
         g.setColor(wordC);
         g.drawString("step", x + spaceX, y + spaceY);
         g.drawRoundRect(x, y, BUTTON_WIDTH, BUTTON_HEIGHT, arcWidth, arcHeight);
 
-        y += (int)(0.5 * BUTTON_SPACE) + BUTTON_HEIGHT;
-        if (mx >= x && mx <= x + BUTTON_WIDTH && my >= y && my <= y + BUTTON_HEIGHT){
+        y += (int) (0.5 * BUTTON_SPACE) + BUTTON_HEIGHT;
+        if (mx >= x && mx <= x + BUTTON_WIDTH && my >= y && my <= y + BUTTON_HEIGHT) {
             g.setColor(markedC);
-        }
-        else
+        } else
             g.setColor(inC);
         g.fillRoundRect(x, y, BUTTON_WIDTH, BUTTON_HEIGHT, arcWidth, arcHeight);
         g.setColor(wordC);
-        g.drawString("new maze", x + spaceX, y + BUTTON_HEIGHT - (int)(0.2 * g.getFont().getSize()));
+        g.drawString("new maze", x + spaceX, y + BUTTON_HEIGHT - (int) (0.2 * g.getFont().getSize()));
         g.drawRoundRect(x, y, BUTTON_WIDTH, BUTTON_HEIGHT, arcWidth, arcHeight);
 
-        y += (int)(0.5 * BUTTON_SPACE) + BUTTON_HEIGHT;
+        y += (int) (0.5 * BUTTON_SPACE) + BUTTON_HEIGHT;
         if (step != 4)
             g.setColor(unavailableC);
-        else if (mx >= x && mx <= x + BUTTON_WIDTH && my >= y && my <= y + BUTTON_HEIGHT){
+        else if (mx >= x && mx <= x + BUTTON_WIDTH && my >= y && my <= y + BUTTON_HEIGHT) {
             g.setColor(markedC);
-        }
-        else
+        } else
             g.setColor(inC);
         g.fillRoundRect(x, y, BUTTON_WIDTH, BUTTON_HEIGHT, arcWidth, arcHeight);
         g.setColor(wordC);
         g.drawString("reposition start", x + spaceX, y + spaceY);
         g.drawRoundRect(x, y, BUTTON_WIDTH, BUTTON_HEIGHT, arcWidth, arcHeight);
 
-        y += (int)(0.5 * BUTTON_SPACE) + BUTTON_HEIGHT;
+        y += (int) (0.5 * BUTTON_SPACE) + BUTTON_HEIGHT;
         if (step != 4)
             g.setColor(unavailableC);
-        else if (mx >= x && mx <= x + BUTTON_WIDTH && my >= y && my <= y + BUTTON_HEIGHT){
+        else if (mx >= x && mx <= x + BUTTON_WIDTH && my >= y && my <= y + BUTTON_HEIGHT) {
             g.setColor(markedC);
-        }
-        else
+        } else
             g.setColor(inC);
         g.fillRoundRect(x, y, BUTTON_WIDTH, BUTTON_HEIGHT, arcWidth, arcHeight);
         g.setColor(wordC);
         g.drawString("reposition end", x + spaceX, y + spaceY);
         g.drawRoundRect(x, y, BUTTON_WIDTH, BUTTON_HEIGHT, arcWidth, arcHeight);
 
-        y += (int)(0.5 * BUTTON_SPACE) + BUTTON_HEIGHT;
+        y += (int) (0.5 * BUTTON_SPACE) + BUTTON_HEIGHT;
         if (step != 4)
             g.setColor(unavailableC);
-        else if (mx >= x && mx <= x + BUTTON_WIDTH && my >= y && my <= y + BUTTON_HEIGHT){
+        else if (mx >= x && mx <= x + BUTTON_WIDTH && my >= y && my <= y + BUTTON_HEIGHT) {
             g.setColor(markedC);
-        }
-        else
+        } else
             g.setColor(inC);
         g.fillRoundRect(x, y, BUTTON_WIDTH, BUTTON_HEIGHT, arcWidth, arcHeight);
         g.setColor(wordC);
         g.drawString("maze to tree", x + spaceX, y + spaceY);
         g.drawRoundRect(x, y, BUTTON_WIDTH, BUTTON_HEIGHT, arcWidth, arcHeight);
 
-        y += (int)(0.5 * BUTTON_SPACE) + BUTTON_HEIGHT;
+        y += (int) (0.5 * BUTTON_SPACE) + BUTTON_HEIGHT;
         if (step != 10)
             g.setColor(unavailableC);
-        else if (mx >= x && mx <= x + BUTTON_WIDTH && my >= y && my <= y + BUTTON_HEIGHT){
+        else if (mx >= x && mx <= x + BUTTON_WIDTH && my >= y && my <= y + BUTTON_HEIGHT) {
             g.setColor(markedC);
-        }
-        else
+        } else
             g.setColor(inC);
         g.fillRoundRect(x, y, BUTTON_WIDTH, BUTTON_HEIGHT, arcWidth, arcHeight);
         g.setColor(wordC);
@@ -418,19 +414,19 @@ public class Board extends JPanel implements ActionListener, MouseListener {
         g.drawRoundRect(x, y, BUTTON_WIDTH, BUTTON_HEIGHT, arcWidth, arcHeight);
     }
 
-    private int binSearchH(Double in, ArrayList<Double> arr){
-        return binSearch(arr, in,0, arr.size() - 1);
+    private int binSearchH(Double in, ArrayList<Double> arr) {
+        return binSearch(arr, in, 0, arr.size() - 1);
     }
 
-    private int binSearch(ArrayList<Double> arr, Double in, int start, int finish){
+    private int binSearch(ArrayList<Double> arr, Double in, int start, int finish) {
         if (start > finish)
             return start;
-        if (start == finish){
+        if (start == finish) {
             if (in < arr.get(start))
                 return start;
             return start + 1;
         }
-        if (start + 1 == finish){
+        if (start + 1 == finish) {
             if (in < arr.get(start))
                 return start;
             if (in > arr.get(finish))
@@ -458,101 +454,101 @@ public class Board extends JPanel implements ActionListener, MouseListener {
         searchedCells.add(index, searching);
         for (Transition transition : searching.getTransitions())
             if (transition != null)
-                if (!treeCellExistsIn((TreeCell)transition.getCells()[1], searchedCells, binHelp1)){
-                    value = evaluate((TreeCell)transition.getCells()[1]);
+                if (!treeCellExistsIn((TreeCell) transition.getCells()[1], searchedCells, binHelp1)) {
+                    value = evaluate((TreeCell) transition.getCells()[1]);
                     index = binSearchH(value, binHelp);
                     binHelp.add(index, value);
-                    searchCells.add(index, (TreeCell)transition.getCells()[1]);
+                    searchCells.add(index, (TreeCell) transition.getCells()[1]);
                 }
         searchCells.get(0).colorBackwards(SearchColor, WallColor);
         searchCells.get(0).colorBackwards(SearchColor, SearchedColor);
     }
 
-    public boolean treeCellExistsIn(TreeCell query, ArrayList<TreeCell> list, ArrayList<Double> arrL){
+    public boolean treeCellExistsIn(TreeCell query, ArrayList<TreeCell> list, ArrayList<Double> arrL) {
         double value = evaluate(query);
         int index = binSearchH(value, arrL);
         if (index >= arrL.size())
             return false;
-        for (;index > 0 && arrL.get(index - 1) == value; index--);
-        for (;arrL.get(index) == value; index++)
+        for (; index > 0 && arrL.get(index - 1) == value; index--) ;
+        for (; arrL.get(index) == value; index++)
             if (list.get(index).equals(query))
                 return true;
         return false;
     }
 
-    public double evaluate(TreeCell query){
+    public double evaluate(TreeCell query) {
         int x = query.getArrX() - finishX;
         int y = query.getArrY() - finishY;
-        return x*x + y*y;
+        return x * x + y * y;
     }
 
-    public void resetCells(){
+    public void resetCells() {
         for (int i = 0; i < cells.length; i++)
-            for (int j = 0; j < cells[i].length; j++){
+            for (int j = 0; j < cells[i].length; j++) {
                 cells[i][j] = new MazeCell(i, j, CELLSIZE, CellToWallRatio, WallColor, CellColor);
                 cells[i][j].setDrawn(true);
             }
     }
 
-    public void resetPaths(){
+    public void resetPaths() {
         MTMTransition trn;
         int ind;
         for (int i = 0; i < cells.length; i++)
             for (int j = 0; j < cells[i].length; j++)
                 for (int k = 0; k <= 1; k++)
-                    if (i + k < cells.length && j + (1 - k) < cells[i].length){
-                        trn = new MTMTransition(cells[i][j], cells[i + k][j + (1 - k)], CellColor,  CELLSIZE, CellToWallRatio);
+                    if (i + k < cells.length && j + (1 - k) < cells[i].length) {
+                        trn = new MTMTransition(cells[i][j], cells[i + k][j + (1 - k)], CellColor, CELLSIZE, CellToWallRatio);
                         ind = binSearchH(trn.getWeight(), binHelp);
                         paths.add(ind, trn);
                         binHelp.add(ind, trn.getWeight());
                     }
     }
 
-    public void ellersHelper(int a, int b){
+    public void ellersHelper(int a, int b) {
         for (int i = 0; i < cells.length; i++)
             for (int j = 0; j <= startY; j++)
                 if (intCells[i][j] == a)
                     intCells[i][j] = b;
     }
 
-    public void addPaths(MazeCell cell, ArrayList<MTMTransition> paths, ArrayList<Double> list){
+    public void addPaths(MazeCell cell, ArrayList<MTMTransition> paths, ArrayList<Double> list) {
         MTMTransition path;
         int x = cell.getArrX(), y = cell.getArrY();
         int i;
-        if (x > 0){
+        if (x > 0) {
             path = new MTMTransition(cells[x][y], cells[x - 1][y], CellColor, CELLSIZE, CellToWallRatio);
             i = binSearchH(path.getWeight(), list);
             list.add(i, path.getWeight());
             paths.add(i, path);
         }
-        if (y > 0){
+        if (y > 0) {
             path = new MTMTransition(cells[x][y], cells[x][y - 1], CellColor, CELLSIZE, CellToWallRatio);
             i = binSearchH(path.getWeight(), list);
             list.add(i, path.getWeight());
             paths.add(i, path);
         }
-        if (x + 1 < cells.length){
+        if (x + 1 < cells.length) {
             path = new MTMTransition(cells[x][y], cells[x + 1][y], CellColor, CELLSIZE, CellToWallRatio);
             i = binSearchH(path.getWeight(), list);
             list.add(i, path.getWeight());
             paths.add(i, path);
         }
-        if (y + 1 < cells[0].length){
+        if (y + 1 < cells[0].length) {
             path = new MTMTransition(cells[x][y], cells[x][y + 1], CellColor, CELLSIZE, CellToWallRatio);
             i = binSearchH(path.getWeight(), list);
             list.add(i, path.getWeight());
             paths.add(i, path);
-        };
+        }
     }
 
     @Override
     public void mouseClicked(MouseEvent e) {
         double x = MouseInfo.getPointerInfo().getLocation().getX() - getLocationOnScreen().getX(), y = MouseInfo.getPointerInfo().getLocation().getY() - getLocationOnScreen().getY();
         int xs = B_WIDTH - (B_WIDTH - (cells.length * CELLSIZE)) / 2 - BUTTON_WIDTH / 2, ys = 0;
-        if (x >= xs && x <= xs + BUTTON_WIDTH){
+        if (x >= xs && x <= xs + BUTTON_WIDTH) {
             for (int i = 0; i < 5; i++) {
-                ys += (int)(0.5 * BUTTON_SPACE) + BUTTON_HEIGHT;
-                if (y >= ys && y <= ys + BUTTON_HEIGHT){
+                ys += (int) (0.5 * BUTTON_SPACE) + BUTTON_HEIGHT;
+                if (y >= ys && y <= ys + BUTTON_HEIGHT) {
                     if (step < 0)
                         step = -1;
                     else
@@ -561,40 +557,40 @@ public class Board extends JPanel implements ActionListener, MouseListener {
                 }
             }
 
-            ys += (int)(0.7 * BUTTON_SPACE) + 2 * BUTTON_HEIGHT;
+            ys += (int) (0.7 * BUTTON_SPACE) + 2 * BUTTON_HEIGHT;
             if (y >= ys && y <= ys + BUTTON_HEIGHT)
                 step *= -1;
 
-            ys += (int)(0.5 * BUTTON_SPACE) + BUTTON_HEIGHT;
+            ys += (int) (0.5 * BUTTON_SPACE) + BUTTON_HEIGHT;
             if (y >= ys && y <= ys + BUTTON_HEIGHT && step < 0 && step > -1000)
                 step -= 1000;
 
-            ys += (int)(0.5 * BUTTON_SPACE) + BUTTON_HEIGHT;
-            if (y >= ys && y <= ys + BUTTON_HEIGHT){
+            ys += (int) (0.5 * BUTTON_SPACE) + BUTTON_HEIGHT;
+            if (y >= ys && y <= ys + BUTTON_HEIGHT) {
                 if (step < 0)
                     step = -1;
                 else
                     step = 1;
             }
 
-            ys += (int)(0.5 * BUTTON_SPACE) + BUTTON_HEIGHT;
-            if (y >= ys && y <= ys + BUTTON_HEIGHT && step == 4){
+            ys += (int) (0.5 * BUTTON_SPACE) + BUTTON_HEIGHT;
+            if (y >= ys && y <= ys + BUTTON_HEIGHT && step == 4) {
                 cells[startX][startY].setCellColor(CellColor);
                 cells[startX][startY].setWallColor(WallColor);
                 step = 5;
                 return;
             }
 
-            ys += (int)(0.5 * BUTTON_SPACE) + BUTTON_HEIGHT;
-            if (y >= ys && y <= ys + BUTTON_HEIGHT && step == 4){
+            ys += (int) (0.5 * BUTTON_SPACE) + BUTTON_HEIGHT;
+            if (y >= ys && y <= ys + BUTTON_HEIGHT && step == 4) {
                 cells[finishX][finishY].setCellColor(CellColor);
                 cells[finishX][finishY].setWallColor(WallColor);
                 step = 6;
                 return;
             }
 
-            ys += (int)(0.5 * BUTTON_SPACE) + BUTTON_HEIGHT;
-            if (y >= ys && y <= ys + BUTTON_HEIGHT && step == 4){
+            ys += (int) (0.5 * BUTTON_SPACE) + BUTTON_HEIGHT;
+            if (y >= ys && y <= ys + BUTTON_HEIGHT && step == 4) {
                 trees.remove(0);
                 trees.add(new TransformingCell(cells[startX][startY], MOVINGRATE, WALLRATE, 0, 0, GOALSIZE, M_HEIGHT, M_WIDTH, treeSize));
                 treeSize.add(0, 1);
@@ -603,8 +599,8 @@ public class Board extends JPanel implements ActionListener, MouseListener {
                 step = 8;
             }
 
-            ys += (int)(0.5 * BUTTON_SPACE) + BUTTON_HEIGHT;
-            if (y >= ys && y <= ys + BUTTON_HEIGHT && step == 10){
+            ys += (int) (0.5 * BUTTON_SPACE) + BUTTON_HEIGHT;
+            if (y >= ys && y <= ys + BUTTON_HEIGHT && step == 10) {
                 step = 11;
                 binHelp.clear();
                 binHelp1.clear();
@@ -615,11 +611,10 @@ public class Board extends JPanel implements ActionListener, MouseListener {
                 trees.get(0).resetSearched();
                 ((TreeCell) trees.get(0)).resetColor(WallColor);
             }
-        }
-        else{
+        } else {
             if (step == 5)
-                if(0 <= x/CELLSIZE && x/CELLSIZE <= cells.length && 0 <= y/CELLSIZE && y/CELLSIZE <= cells[0].length)
-                    if (cells[(int)(x/CELLSIZE)][(int)(y/CELLSIZE)].getCellColor() != FinishColor){
+                if (0 <= x / CELLSIZE && x / CELLSIZE <= cells.length && 0 <= y / CELLSIZE && y / CELLSIZE <= cells[0].length)
+                    if (cells[(int) (x / CELLSIZE)][(int) (y / CELLSIZE)].getCellColor() != FinishColor) {
                         cells[(int) (mouseX / CELLSIZE)][(int) (mouseY / CELLSIZE)].setCellColor(CellColor);
                         cells[(int) (mouseX / CELLSIZE)][(int) (mouseY / CELLSIZE)].setWallColor(WallColor);
                         mouseX = x;
@@ -631,18 +626,18 @@ public class Board extends JPanel implements ActionListener, MouseListener {
                         step = 4;
                         trees.remove(0);
                         trees.add(0, cells[startX][startY]);
-                }
+                    }
             if (step == 6)
-                if(0 <= x/CELLSIZE && x/CELLSIZE <= cells.length && 0 <= y/CELLSIZE && y/CELLSIZE <= cells[0].length){
-                    if (cells[(int)(x/CELLSIZE)][(int)(y/CELLSIZE)].getCellColor() != StartColor){
-                        cells[(int)(mouseX/CELLSIZE)][(int)(mouseY/CELLSIZE)].setCellColor(CellColor);
-                        cells[(int)(mouseX/CELLSIZE)][(int)(mouseY/CELLSIZE)].setWallColor(WallColor);
+                if (0 <= x / CELLSIZE && x / CELLSIZE <= cells.length && 0 <= y / CELLSIZE && y / CELLSIZE <= cells[0].length) {
+                    if (cells[(int) (x / CELLSIZE)][(int) (y / CELLSIZE)].getCellColor() != StartColor) {
+                        cells[(int) (mouseX / CELLSIZE)][(int) (mouseY / CELLSIZE)].setCellColor(CellColor);
+                        cells[(int) (mouseX / CELLSIZE)][(int) (mouseY / CELLSIZE)].setWallColor(WallColor);
                         mouseX = x;
                         mouseY = y;
-                        cells[(int)(mouseX/CELLSIZE)][(int)(mouseY/CELLSIZE)].setCellColor(FinishColor);
-                        cells[(int)(mouseX/CELLSIZE)][(int)(mouseY/CELLSIZE)].setWallColor(FinishColor);
-                        finishX = (int)(mouseX/CELLSIZE);
-                        finishY = (int)(mouseY/CELLSIZE);
+                        cells[(int) (mouseX / CELLSIZE)][(int) (mouseY / CELLSIZE)].setCellColor(FinishColor);
+                        cells[(int) (mouseX / CELLSIZE)][(int) (mouseY / CELLSIZE)].setWallColor(FinishColor);
+                        finishX = (int) (mouseX / CELLSIZE);
+                        finishY = (int) (mouseY / CELLSIZE);
                         step = 4;
                     }
                 }
@@ -671,18 +666,18 @@ public class Board extends JPanel implements ActionListener, MouseListener {
 
     // maze creating algorithms:
 
-    public void primStep(){
-        if (paths.isEmpty()){
+    public void primStep() {
+        if (paths.isEmpty()) {
             step = 3;
             return;
         }
         int i = 0;
         MTMTransition path = paths.remove(i);
         binHelp.remove(i);
-        while (intCells[path.getCells()[0].getArrX()][path.getCells()[0].getArrY()] == -1 && intCells[path.getCells()[1].getArrX()][path.getCells()[1].getArrY()] == -1){
+        while (intCells[path.getCells()[0].getArrX()][path.getCells()[0].getArrY()] == -1 && intCells[path.getCells()[1].getArrX()][path.getCells()[1].getArrY()] == -1) {
             path = paths.remove(i);
             binHelp.remove(i);
-            if (paths.isEmpty()){
+            if (paths.isEmpty()) {
                 step = 3;
                 startY = 0;
                 startX = 0;
@@ -697,17 +692,17 @@ public class Board extends JPanel implements ActionListener, MouseListener {
         addPaths(path.getCells()[0], paths, binHelp);
     }
 
-    private void kruskalStep(){
-        if (paths.isEmpty()){
+    private void kruskalStep() {
+        if (paths.isEmpty()) {
             step = 3;
             return;
         }
         int i = 0;
         paths.get(i).getCells()[1].resetSearched();
         boolean flag = paths.get(i).getCells()[0].dfsShell(paths.get(i).getCells()[1]);
-        while (flag){
+        while (flag) {
             paths.remove(i);
-            if (paths.isEmpty()){
+            if (paths.isEmpty()) {
                 step = 3;
                 return;
             }
@@ -718,11 +713,10 @@ public class Board extends JPanel implements ActionListener, MouseListener {
         paths.get(i).getCells()[0].setTrans(paths.get(i));
         paths.get(i).getCells()[1].setTrans(paths.get(i));
         trees.add(paths.get(i).getCells()[0]);
-
         paths.remove(i);
     }
 
-    private void dfsStep(){
+    private void dfsStep() {
         int temp = intCells[startX][startY];
         MazeCell cell = cells[startX][startY];
         cell.setSearched(true);
@@ -739,41 +733,43 @@ public class Board extends JPanel implements ActionListener, MouseListener {
         if (startY + 1 < cells[startX].length)
             if (!cells[startX][startY + 1].isSearched())
                 arr.add(startX + (startY + 1) * cells.length);
-        if (arr.size() == 0){
-            if (temp == -1)
+        if (arr.size() == 0) {
+            if (temp == -1) {
+                startX = 0;
+                startY = 0;
                 step = 3;
-            else{
-                startX = temp%cells.length;
-                startY = temp/cells.length;
+            } else {
+                startX = temp % cells.length;
+                startY = temp / cells.length;
             }
             return;
         }
         temp = arr.get(rnd.nextInt(arr.size()));
-        startX = temp%cells.length;
-        startY = temp/cells.length;
+        startX = temp % cells.length;
+        startY = temp / cells.length;
         intCells[startX][startY] = cell.getArrX() + cell.getArrY() * cells.length;
-        Transition transition = new MTMTransition(cell, cells[startX][startY], CellColor,  CELLSIZE, CellToWallRatio);
+        Transition transition = new MTMTransition(cell, cells[startX][startY], CellColor, CELLSIZE, CellToWallRatio);
         cell.setTrans(transition);
         cells[startX][startY].setTrans(transition);
     }
 
-    public void ellerStep(){
+    public void ellerStep() {
         double chance = EllersChance;
-        if (startY == cells[0].length - 1){
+        if (startY == cells[0].length - 1) {
             chance = 1;
         }
 
-        if (!(startY == 0)){
+        if (!(startY == 0)) {
             int[] arr = new int[cells.length * startY];
             for (int i = 0; i < cells.length; i++)
                 arr[i] = 0;
-            for (int i = 0; i < cells.length; i++){
-                arr[intCells[i][startY - 1] - 1] ++;
+            for (int i = 0; i < cells.length; i++) {
+                arr[intCells[i][startY - 1] - 1]++;
             }
 
             ArrayList<Boolean> arr1 = new ArrayList<>();
-            for (int i = 0; i < arr.length; i++){
-                if (arr[i] != 0){
+            for (int i = 0; i < arr.length; i++) {
+                if (arr[i] != 0) {
                     arr1.add(true);
                     for (int j = 0; j < arr[i] - 1; j++)
                         if (rnd.nextDouble() <= chance)
@@ -784,8 +780,8 @@ public class Board extends JPanel implements ActionListener, MouseListener {
 
                 for (int j = 0; j < cells.length; j++)
                     if (i + 1 == intCells[j][startY - 1])
-                        if (arr1.remove(rnd.nextInt(arr1.size())) && intCells[j][startY - 1] != intCells[j][startY]){
-                            Transition transition = new MTMTransition(cells[j][startY], cells[j][startY - 1], CellColor,  CELLSIZE, CellToWallRatio);
+                        if (arr1.remove(rnd.nextInt(arr1.size())) && intCells[j][startY - 1] != intCells[j][startY]) {
+                            Transition transition = new MTMTransition(cells[j][startY], cells[j][startY - 1], CellColor, CELLSIZE, CellToWallRatio);
                             cells[j][startY - 1].setTrans(transition);
                             cells[j][startY].setTrans(transition);
                             intCells[j][startY] = intCells[j][startY - 1];
@@ -798,8 +794,8 @@ public class Board extends JPanel implements ActionListener, MouseListener {
                 intCells[i][startY] = i + startY * cells.length + 1;
 
         for (int i = 0; i < cells.length - 1; i++)
-            if (rnd.nextDouble() <= chance && intCells[i][startY] != intCells[i + 1][startY]){
-                Transition transition = new MTMTransition(cells[i][startY], cells[i + 1][startY], CellColor,  CELLSIZE, CellToWallRatio);
+            if (rnd.nextDouble() <= chance && intCells[i][startY] != intCells[i + 1][startY]) {
+                Transition transition = new MTMTransition(cells[i][startY], cells[i + 1][startY], CellColor, CELLSIZE, CellToWallRatio);
                 cells[i][startY].setTrans(transition);
                 cells[i + 1][startY].setTrans(transition);
                 ellersHelper(intCells[i + 1][startY], intCells[i][startY]);
@@ -809,77 +805,92 @@ public class Board extends JPanel implements ActionListener, MouseListener {
             if (intCells[i][startY] > startY * cells.length)
                 trees.add(cells[i][startY]);
         startY += 1;
-        if (startY == cells[0].length){
+        if (startY == cells[0].length) {
             startY = 0;
             step = 3;
         }
-        for (Cell[] clls:cells)
-            for (Cell cell:clls)
+        for (Cell[] clls : cells)
+            for (Cell cell : clls)
                 cell.resetDrawn();
     }
 
-    public void recursiveDivisionStep(){
-        System.out.println(2);
-    }
-
-    public void wilsonStep(){
-        int temp = intCells[startX][startY];
-        MazeCell cell = cells[startX][startY];
-        ArrayList<Integer> arr = new ArrayList<>();
-        if (startX > 0)
-            arr.add(startX - 1 + startY * cells.length);
-        if (startY > 0)
-            arr.add(startX + (startY - 1) * cells.length);
-        if (startX + 1 < cells.length)
-            arr.add(startX + 1 + startY * cells.length);
-        if (startY + 1 < cells[startX].length)
-            arr.add(startX + (startY + 1) * cells.length);
-        if (arr.size() == 0){
-            if (temp == -1)
+    public void wilsonStep() {
+        if (intCells[startX][startY] == -1) {
+            boolean flag = true;
+            int starterY, starterX;
+            for (starterY = 0; starterY < intCells[0].length && flag; starterY++) {
+                for (starterX = 0; starterX < intCells.length; starterX++)
+                    if (intCells[starterX][starterY] == 0) {
+                        flag = false;
+                        if (starterX == 0)
+                            intCells[starterX][starterY] = starterX + (starterY - 1) * intCells.length;
+                        else
+                            intCells[starterX][starterY] = starterX - 1 + starterY * intCells.length;
+                        trees.add(1, cells[starterX][starterY]);
+                        cells[starterX][starterY].setWallColor(SearchColor);
+                        startX = starterX;
+                        startY = starterY;
+                        break;
+                    }
+            }
+            if (intCells[startX][startY] == -1) {
+                startX = 0;
+                startY = 0;
                 step = 3;
-            else{
-                cell.setSearched(false);
-                intCells[startX][startY] = 0;
-                startX = temp%cells.length;
-                startY = temp/cells.length;
-
             }
             return;
         }
+
+        int temp = intCells[startX][startY];
+        MazeCell cell = cells[startX][startY];
+        ArrayList<Integer> arr = new ArrayList<>();
+        if (startX > 0 && temp % cells.length != startX - 1)
+            arr.add(startX - 1 + startY * cells.length);
+        if (startY > 0 && temp / cells.length != startY - 1)
+            arr.add(startX + (startY - 1) * cells.length);
+        if (startX + 1 < cells.length && temp % cells.length != startX + 1)
+            arr.add(startX + 1 + startY * cells.length);
+        if (startY + 1 < cells[startX].length && temp / cells.length != startY + 1)
+            arr.add(startX + (startY + 1) * cells.length);
         temp = arr.get(rnd.nextInt(arr.size()));
-        startX = temp%cells.length;
-        startY = temp/cells.length;
-        if (intCells[startX][startY] == 0){
+        startX = temp % cells.length;
+        startY = temp / cells.length;
+        if (intCells[startX][startY] == 0) {
             intCells[startX][startY] = cell.getArrX() + cell.getArrY() * cells.length;
-            Transition transition = new MTMTransition(cell, cells[startX][startY], CellColor,  CELLSIZE, CellToWallRatio);
+            cells[startX][startY].setWallColor(SearchColor);
+            Transition transition = new MTMTransition(cell, cells[startX][startY], CellColor, CELLSIZE, CellToWallRatio);
             cell.setTrans(transition);
             cells[startX][startY].setTrans(transition);
             return;
         }
-        if (intCells[startX][startY] == -1){
-            Transition transition = new MTMTransition(cell, cells[startX][startY], CellColor,  CELLSIZE, CellToWallRatio);
+        if (intCells[startX][startY] == -1) {
+            Transition transition = new MTMTransition(cell, cells[startX][startY], CellColor, CELLSIZE, CellToWallRatio);
             cell.setTrans(transition);
             cells[startX][startY].setTrans(transition);
             int x = cell.getArrX(), y = cell.getArrY();
-            while (intCells[x][y] != -1){
-                cell = cells[x][y];
+            while (intCells[x][y] != -1) {
+                cell.setWallColor(WallColor);
+                cell = cells[intCells[x][y] % cells.length][intCells[x][y] / cells.length];
                 intCells[x][y] = -1;
                 x = cell.getArrX();
                 y = cell.getArrY();
             }
-        }
-        else{
+            startX = x;
+            startY = y;
+        } else {
             int x = cell.getArrX(), y = cell.getArrY();
-            while (intCells[x][y] != -1){
-                cell.delTrans((MTMTransition)cell.getTransitions()[0]);
-                cell = cells[x][y];
+            while (intCells[x][y] != -1) {
+                cell.setWallColor(WallColor);
+                if (cell.getTransitions()[0] != null)
+                    cell.getTransitions()[0].delself();
+                cell = cells[intCells[x][y] % cells.length][intCells[x][y] / cells.length];
                 intCells[x][y] = 0;
                 x = cell.getArrX();
                 y = cell.getArrY();
             }
+            startX = x;
+            startY = y;
+            trees.remove(1);
         }
-//        for (int i = 0; i < cells.length; i++)
-//            for (int j = 0; j < cells[i].length; j++)
-
     }
 }

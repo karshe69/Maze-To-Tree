@@ -60,10 +60,8 @@ public abstract class Cell {
 
     public void setTrans(Transition transition){
         int i = 0;
-        while (transitions[i] != null){
-            System.out.println(transition.getCells()[0].getArrX() + " " + transition.getCells()[0].getArrY());
-            System.out.println(transition.getCells()[1].getArrX() + " " + transition.getCells()[1].getArrY());
-            i++;}
+        while (transitions[i] != null)
+            i++;
         transitions[i] = transition;
     }
 
