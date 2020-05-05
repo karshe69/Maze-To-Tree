@@ -137,8 +137,10 @@ public class Board extends JPanel implements ActionListener, MouseListener {
                 trees.add(cells[startX][startY]);
             }
             if (creationFlag == 3) {
-                for (int[] clls : intCells)
-                    Arrays.fill(clls, 0);
+                for (int i = 0; i < cells.length; i++)
+                    for (int j = 0; j < cells[i].length; j++)
+                        if (intCells[i][j] == 0)
+                            intCells[i][j] = i + j * cells.length + 1;
                 timer.setDelay(DELAYE);
             }
             if (creationFlag == 4) {
@@ -830,10 +832,6 @@ public class Board extends JPanel implements ActionListener, MouseListener {
                         }
             }
         }
-
-        for (int i = 0; i < cells.length; i++)
-            if (intCells[i][startY] == 0)
-                intCells[i][startY] = i + startY * cells.length + 1;
 
         for (int i = 0; i < cells.length - 1; i++)
             if (rnd.nextDouble() <= chance && intCells[i][startY] != intCells[i + 1][startY]) {
