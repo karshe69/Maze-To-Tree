@@ -31,7 +31,8 @@ public class Board extends JPanel implements ActionListener, MouseListener {
     private final int M_HEIGHT = B_HEIGHT - TOPBAR; // height of the actual maze part of the screen
 
     private final int DELAY1 = 20; // tick delay for creating the maze
-    private final int DELAYE = 300; // tick delay while creating an eller's maze
+    private final int DELAYE = 300; // tick delay while creating an Eller's maze
+    private final int DELAYW = 1; // tick delay while creating an Wilson's maze
     private final int DELAY2 = 20; // tick delay for all other stuff
 
     private final double CellToWallRatio = 0.9; // the ratio between the maze cell and its wall
@@ -150,6 +151,7 @@ public class Board extends JPanel implements ActionListener, MouseListener {
                 startY = 0;
                 trees.add(0, cells[0][0]);
                 intCells[0][0] = -1;
+                timer.setDelay(DELAYW);
             }
             if (step == 1)
                 step = 2;
@@ -863,9 +865,9 @@ public class Board extends JPanel implements ActionListener, MouseListener {
                     if (intCells[starterX][starterY] == 0) {
                         flag = false;
                         if (starterX == 0)
-                            intCells[starterX][starterY] = starterX + (starterY - 1) * intCells.length;
+                            intCells[starterX][starterY] = starterX + 1 + (starterY - 1) * intCells.length;
                         else
-                            intCells[starterX][starterY] = starterX - 1 + starterY * intCells.length;
+                            intCells[starterX][starterY] = starterX + starterY * intCells.length;
                         trees.add(1, cells[starterX][starterY]);
                         cells[starterX][starterY].setWallColor(SearchColor);
                         startX = starterX;
@@ -881,7 +883,7 @@ public class Board extends JPanel implements ActionListener, MouseListener {
             return;
         }
 
-        int temp = intCells[startX][startY];
+        int temp = intCells[startX][startY] - 1;
         MazeCell cell = cells[startX][startY];
         ArrayList<Integer> arr = new ArrayList<>();
         if (startX > 0 && temp % cells.length != startX - 1)
@@ -896,7 +898,7 @@ public class Board extends JPanel implements ActionListener, MouseListener {
         startX = temp % cells.length;
         startY = temp / cells.length;
         if (intCells[startX][startY] == 0) {
-            intCells[startX][startY] = cell.getArrX() + cell.getArrY() * cells.length;
+            intCells[startX][startY] = cell.getArrX() + cell.getArrY() * cells.length + 1;
             cells[startX][startY].setWallColor(SearchColor);
             Transition transition = new MTMTransition(cell, cells[startX][startY], CellColor, CELLSIZE, CellToWallRatio);
             cell.setTrans(transition);
@@ -910,7 +912,7 @@ public class Board extends JPanel implements ActionListener, MouseListener {
             int x = cell.getArrX(), y = cell.getArrY();
             while (intCells[x][y] != -1) {
                 cell.setWallColor(WallColor);
-                cell = cells[intCells[x][y] % cells.length][intCells[x][y] / cells.length];
+                cell = cells[(intCells[x][y] - 1) % cells.length][(intCells[x][y] - 1) / cells.length];
                 intCells[x][y] = -1;
                 x = cell.getArrX();
                 y = cell.getArrY();
@@ -919,18 +921,17 @@ public class Board extends JPanel implements ActionListener, MouseListener {
             startY = y;
         } else {
             int x = cell.getArrX(), y = cell.getArrY();
-            while (intCells[x][y] != -1) {
+            while (x != startX || y != startY) {
                 cell.setWallColor(WallColor);
                 if (cell.getTransitions()[0] != null)
                     cell.getTransitions()[0].delself();
-                cell = cells[intCells[x][y] % cells.length][intCells[x][y] / cells.length];
+                cell = cells[(intCells[x][y] - 1) % cells.length][(intCells[x][y] - 1) / cells.length];
                 intCells[x][y] = 0;
                 x = cell.getArrX();
                 y = cell.getArrY();
             }
             startX = x;
             startY = y;
-            trees.remove(1);
         }
     }
 }
