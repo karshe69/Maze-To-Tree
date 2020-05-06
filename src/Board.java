@@ -147,8 +147,6 @@ public class Board extends JPanel implements ActionListener, MouseListener {
             if (creationFlag == 4) {
                 for (int[] clls : intCells)
                     Arrays.fill(clls, 0);
-                startX = 0;
-                startY = 0;
                 trees.add(0, cells[0][0]);
                 intCells[0][0] = -1;
                 timer.setDelay(DELAYW);
