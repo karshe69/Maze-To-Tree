@@ -451,30 +451,30 @@ public class Board extends JPanel implements ActionListener, MouseListener {
         g.drawRoundRect(x, y, BUTTON_WIDTH, BUTTON_HEIGHT, arcWidth, arcHeight);
     }
 
-    private int binSearch(Double in, ArrayList<Double> arr) { // binary search
-        return binSearchH(arr, in, 0, arr.size() - 1);
+    private int binSearch(Double in, ArrayList<Double> list) { // binary search
+        return binSearchH(list, in, 0, list.size() - 1);
     }
 
-    private int binSearchH(ArrayList<Double> arr, Double input, int start, int finish) { // helps with binary search
+    private int binSearchH(ArrayList<Double> list, Double input, int start, int finish) { // helps with binary search
         if (start > finish)
             return start;
         if (start == finish) {
-            if (input < arr.get(start))
+            if (input < list.get(start))
                 return start;
             return start + 1;
         }
         if (start + 1 == finish) {
-            if (input < arr.get(start))
+            if (input < list.get(start))
                 return start;
-            if (input > arr.get(finish))
+            if (input > list.get(finish))
                 return finish + 1;
             return finish;
         }
         int i = (start + finish) / 2;
-        if (input > arr.get(i))
-            return binSearchH(arr, input, i, finish);
-        if (input < arr.get(i))
-            return binSearchH(arr, input, start, i);
+        if (input > list.get(i))
+            return binSearchH(list, input, i, finish);
+        if (input < list.get(i))
+            return binSearchH(list, input, start, i);
         return i;
     }
 
