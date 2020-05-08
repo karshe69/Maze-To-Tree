@@ -455,26 +455,26 @@ public class Board extends JPanel implements ActionListener, MouseListener {
         return binSearchH(arr, in, 0, arr.size() - 1);
     }
 
-    private int binSearchH(ArrayList<Double> arr, Double in, int start, int finish) { // helps with binary search
+    private int binSearchH(ArrayList<Double> arr, Double input, int start, int finish) { // helps with binary search
         if (start > finish)
             return start;
         if (start == finish) {
-            if (in < arr.get(start))
+            if (input < arr.get(start))
                 return start;
             return start + 1;
         }
         if (start + 1 == finish) {
-            if (in < arr.get(start))
+            if (input < arr.get(start))
                 return start;
-            if (in > arr.get(finish))
+            if (input > arr.get(finish))
                 return finish + 1;
             return finish;
         }
         int i = (start + finish) / 2;
-        if (in > arr.get(i))
-            return binSearchH(arr, in, i, finish);
-        if (in < arr.get(i))
-            return binSearchH(arr, in, start, i);
+        if (input > arr.get(i))
+            return binSearchH(arr, input, i, finish);
+        if (input < arr.get(i))
+            return binSearchH(arr, input, start, i);
         return i;
     }
 
