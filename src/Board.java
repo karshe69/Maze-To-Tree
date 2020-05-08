@@ -41,13 +41,12 @@ public class Board extends JPanel implements ActionListener, MouseListener {
     private final double WALLRATE = 0.05; // the amount of CellToWallRatio decreas in transforming cells each tick
 
     private int creationFlag = -1; //type of maze: 0 = prim's, 1 = kruskal's, 2 = random dfs, 3 = eller's, willson's
-
     private int step = 0; // step of progression in the programer. 0 = start button, 1 = initialization , 2 = creating the maze, 3 & 4 = maze is done, 5 = change the position of the start, 6 = change the position of the end, 7 & 8 = turn maze to tree, 9 = tree is done, 10 = solve maze.
 
-    private final double EllersChance = 0.5; // chance for a connection to be made in an eller's maze
+    private final double ellersChance = 0.5; // chance for a connection to be made in an eller's maze
 
 
-    //colors for the game aesthetic
+    //colors for the app aesthetic
     private final Color CellColor = new Color(34, 53, 64);
     private final Color WallColor = new Color(169, 184, 201);
     private final Color StartColor = new Color(0, 184, 140);
@@ -74,11 +73,12 @@ public class Board extends JPanel implements ActionListener, MouseListener {
 
     private ArrayList<Cell> trees = new ArrayList<>();
 
-    private int[][] intCells = new int[cells.length][cells[0].length]; // for dfs
+    // for utility:
+    private int[][] intCells = new int[cells.length][cells[0].length];
 
     private ArrayList<Integer> treeSize = new ArrayList<>();
 
-    private ArrayList<MTMTransition> paths = new ArrayList<>(); // for kruskal
+    private ArrayList<MTMTransition> paths = new ArrayList<>();
 
     private ArrayList<Double> binHelp = new ArrayList<>(); // for anything related to binary searching
     private ArrayList<Double> binHelp1 = new ArrayList<>(); // for anything related to binary searching
@@ -797,7 +797,7 @@ public class Board extends JPanel implements ActionListener, MouseListener {
     }
 
     public void ellerStep() {
-        double chance = EllersChance;
+        double chance = ellersChance;
         if (startY == cells[0].length - 1) {
             chance = 1;
         }
