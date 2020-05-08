@@ -6,7 +6,7 @@ import Cell.TransformingCell;
 
 import java.awt.*;
 
-public class TTTreeTransition extends Transition{
+public class TTTreeTransition extends Transition{ //transforming to tree transition
     private TreeCell treeCell;
     private TransformingCell transformingCell;
     private int directionX = 0;
