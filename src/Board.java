@@ -30,10 +30,9 @@ public class Board extends JPanel implements ActionListener, MouseListener {
     private final int M_WIDTH = B_WIDTH - BUTTON_WIDTH - 2 * BUTTON_SPACE; // width of the actual maze part of the screen
     private final int M_HEIGHT = B_HEIGHT - TOPBAR; // height of the actual maze part of the screen
 
-    private final int DELAY1 = 20; // tick delay for creating the maze
+    private final int DELAY = 20; // tick delay for non special cases
     private final int DELAYE = 300; // tick delay while creating an Eller's maze
     private final int DELAYW = 1; // tick delay while creating an Wilson's maze
-    private final int DELAY2 = 20; // tick delay for all other stuff
 
     private final double CellToWallRatio = 0.9; // the ratio between the maze cell and its wall
     private final int CELLSIZE = 50; // the size of the maze cells
@@ -94,7 +93,7 @@ public class Board extends JPanel implements ActionListener, MouseListener {
         setPreferredSize(new Dimension(B_WIDTH, B_HEIGHT)); // sets screen size
         setBackground(CellColor);
         addMouseListener(this);
-        timer = new Timer(DELAY1, this);
+        timer = new Timer(DELAY, this);
         timer.start();
     }
 
@@ -119,7 +118,7 @@ public class Board extends JPanel implements ActionListener, MouseListener {
             startY = 0;
             finishX = cells.length - 1;
             finishY = cells[0].length - 1;
-            timer.setDelay(DELAY1);
+            timer.setDelay(DELAY);
             if (creationFlag == 0) {
                 startX = rnd.nextInt(cells.length);
                 startY = rnd.nextInt(cells[startX].length);
@@ -170,7 +169,7 @@ public class Board extends JPanel implements ActionListener, MouseListener {
         if (step == 3) {
             while (trees.size() > 1)
                 trees.remove(0);
-            timer.setDelay(DELAY2);
+            timer.setDelay(DELAY);
             cells[startX][startY].setCellColor(StartColor);
             cells[startX][startY].setWallColor(StartColor);
             cells[finishX][finishY].setCellColor(FinishColor);

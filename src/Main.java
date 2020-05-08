@@ -6,7 +6,6 @@ public class Main extends JFrame {
     public Board board;
 
     public Main() {
-
         initUI();
     }
 
