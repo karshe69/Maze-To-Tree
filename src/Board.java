@@ -40,7 +40,7 @@ public class Board extends JPanel implements ActionListener, MouseListener {
     private final int NODESIZE = 10; // tree node size
     private final double WALLRATE = 0.05; // the amount of CellToWallRatio decreas in transforming cells each tick
 
-    private int creationFlag = -1; //type of maze: 0 = prim's, 1 = kruskal's, 2 = random dfs, 3 = eller's, willson's
+    private int creationFlag = -1; //type of maze: 0 = prim's, 1 = kruskal's, 2 = random dfs, 3 = eller's, 4 = willson's
     private int step = 0; // step of progression in the programer. 0 = start button, 1 = initialization , 2 = creating the maze, 3 & 4 = maze is done, 5 = change the position of the start, 6 = change the position of the end, 7 & 8 = turn maze to tree, 9 = tree is done, 10 = solve maze.
 
     private final double ellersChance = 0.5; // chance for a connection to be made in an eller's maze
@@ -139,8 +139,7 @@ public class Board extends JPanel implements ActionListener, MouseListener {
             if (creationFlag == 3) {
                 for (int i = 0; i < cells.length; i++)
                     for (int j = 0; j < cells[i].length; j++)
-                        if (intCells[i][j] == 0)
-                            intCells[i][j] = i + j * cells.length + 1;
+                        intCells[i][j] = i + j * cells.length + 1;
                 timer.setDelay(DELAYE);
             }
             if (creationFlag == 4) {
