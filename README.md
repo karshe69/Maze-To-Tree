@@ -8,6 +8,8 @@ Well, from (not) the same creator comes the next big thing: Maze-to-Tree!
 
 This project takes the structure of a maze and converts it into a tree structure, allowing for easier traversal, analysis, and manipulation of maze paths.
 
+![mazetotree](https://github.com/user-attachments/assets/5b676f68-8e93-4eaf-8e72-2471ae45dbeb)
+
 Features
  - Convert a maze into a tree-based structure for easy traversal.
 
